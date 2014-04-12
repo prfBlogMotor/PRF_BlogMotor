@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.EditVisitingTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{bundle.EditVisitingLabel_id}" for="id" />
+                    <h:inputText id="id" value="#{visitingController.selected.id}" title="#{bundle.EditVisitingTitle_id}" required="true" requiredMessage="#{bundle.EditVisitingRequiredMessage_id}"/>
+                    <h:outputLabel value="#{bundle.EditVisitingLabel_date}" for="date" />
+                    <h:inputText id="date" value="#{visitingController.selected.date}" title="#{bundle.EditVisitingTitle_date}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:inputText>
+                    <h:outputLabel value="#{bundle.EditVisitingLabel_userid}" for="userid" />
+                    <h:selectOneMenu id="userid" value="#{visitingController.selected.userid}" title="#{bundle.EditVisitingTitle_userid}" >
+                        <f:selectItems value="#{userController.itemsAvailableSelectOne}"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+                <h:commandLink action="#{visitingController.update}" value="#{bundle.EditVisitingSaveLink}"/>
+                <br />
+                <br />
+                <h:link outcome="View" value="#{bundle.EditVisitingViewLink}"/>
+                <br />
+                <h:commandLink action="#{visitingController.prepareList}" value="#{bundle.EditVisitingShowAllLink}" immediate="true"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.EditVisitingIndexLink}" />
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>
