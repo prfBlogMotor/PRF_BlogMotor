@@ -11,12 +11,21 @@
     </h:head>
 
     <h:body>
-        <h1>
-            <ui:insert name="title">Default Title</ui:insert>
-        </h1>
-        <p>
-            <ui:insert name="body">Default Body</ui:insert>
-        </p>
+        <div class="wrapper">
+            <div class="header">
+                <ui:insert name="title">Top Section</ui:insert>
+            </div>
+            <div class="middle">
+                <div class="container">
+                    <div class="content">
+                        <ui:insert name="body">Main Content</ui:insert>
+                    </div>
+                </div>
+                <div class="right-sidebar">
+                     <ui:insert name="right">Right Section</ui:insert>
+                </div>
+            </div>
+        </div>
     </h:body>
 
 </html>
