@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ListPostTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:form styleClass="jsfcrud_list_form">
+                <h:panelGroup id="messagePanel" layout="block">
+                    <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+                </h:panelGroup>
+                <h:outputText escape="false" value="#{bundle.ListPostEmpty}" rendered="#{postController.items.rowCount == 0}"/>
+                <h:panelGroup rendered="#{postController.items.rowCount > 0}">
+                    <p:dataGrid value="#{postController.items}" var="item" columns="1"  
+                                rows="10" paginator="true" paginatorPosition=""
+                                paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+                                rowsPerPageTemplate="10,25,50">
+                        
+                        <p:panel header="#{item.title}" style="text-align:center">  
+                            <table style="width: 100%">
+                                <tr>
+                                    <td style="width: 73%">
+                                        <div>
+                                            #{item.text}
+                                        </div>
+                                    </td>
+                                    <td style="width: 27%">
+                                        <h:panelGrid>
+                                            <p:row>
+                                                <p:column><h:outputText value="Author: " /></p:column>
+                                                <p:column><h:outputText value="#{item.userid}" /></p:column>
+                                            </p:row>
+
+                                            <p:row>
+                                                <p:column><h:outputText value="Date: " /></p:column>
+                                                <p:column><h:outputText value="#{item.date}" /></p:column>
+                                            </p:row>
+
+                                            <p:row>
+                                                <p:column><h:outputText value="Tags: " /></p:column>
+                                                <p:column><h:outputText value="......" /></p:column>
+                                            </p:row>
+
+                                            <p:row>
+                                                <h:commandLink action="#{postController.prepareView}" value="#{bundle.ListPostViewLink}"/>
+                                                <h:commandLink action="#{postController.prepareEdit}" value="#{bundle.ListPostEditLink}"/>
+                                                <h:commandLink action="#{postController.destroy}" value="#{bundle.ListPostDestroyLink}"/>
+                                            </p:row>
+                                        </h:panelGrid>
+                                    </td>
+                                </tr>
+                            </table>
+                        </p:panel>
+                        
+                    </p:dataGrid>
+                </h:panelGroup>
+            </h:form>
+        </ui:define>
+        <ui:define name="right">
+            <h:form styleClass="jsfcrud_list_form">
+                <h:commandLink action="#{postController.prepareCreate}" value="#{bundle.ListPostCreateLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.ListPostIndexLink}"/>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

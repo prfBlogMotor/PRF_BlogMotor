@@ -58,8 +58,8 @@ body {
 -----------------------------------------------------------------------------*/
 .right-sidebar {
 	float: left;
-	width: 250px;
-	margin-left: -340px;
+	width: 180px;
+	margin-left: -270px;
         padding: 20px;
 	position: relative;
 	background: white;
