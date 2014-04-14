@@ -34,7 +34,7 @@
                                         <h:panelGrid>
                                             <p:row>
                                                 <p:column><h:outputText value="Author: " /></p:column>
-                                                <p:column><h:outputText value="#{item.userid}" /></p:column>
+                                                <p:column><h:outputText value="#{item.userid.username}" /></p:column>
                                             </p:row>
 
                                             <p:row>
@@ -44,13 +44,13 @@
 
                                             <p:row>
                                                 <p:column><h:outputText value="Tags: " /></p:column>
-                                                <p:column><h:outputText value="......" /></p:column>
+                                                <p:column><h:outputText value="#{postController.getTaxonomies(item.id)}" /></p:column>
                                             </p:row>
 
                                             <p:row>
-                                                <h:commandLink action="#{postController.prepareView}" value="#{bundle.ListPostViewLink}"/>
-                                                <h:commandLink action="#{postController.prepareEdit}" value="#{bundle.ListPostEditLink}"/>
-                                                <h:commandLink action="#{postController.destroy}" value="#{bundle.ListPostDestroyLink}"/>
+                                                <p:column><h:commandLink action="#{postController.prepareView}" value="#{bundle.ListPostViewLink}"/></p:column>
+                                                <p:column><h:commandLink action="#{postController.prepareEdit}" value="#{bundle.ListPostEditLink}"/></p:column>
+                                                <p:column><h:commandLink action="#{postController.destroy}" value="#{bundle.ListPostDestroyLink}"/></p:column>
                                             </p:row>
                                         </h:panelGrid>
                                     </td>
@@ -64,10 +64,11 @@
         </ui:define>
         <ui:define name="right">
             <h:form styleClass="jsfcrud_list_form">
-                <h:commandLink action="#{postController.prepareCreate}" value="#{bundle.ListPostCreateLink}"/>
-                <br />
-                <br />
-                <h:link outcome="/index" value="#{bundle.ListPostIndexLink}"/>
+                <p:panelGrid columns="1" style="width: 100%">
+                    <f:facet name="header">Commands</f:facet>  
+                    <h:commandLink action="#{postController.prepareCreate}" value="#{bundle.ListPostCreateLink}"/>
+                    <h:link outcome="/index" value="#{bundle.ListPostIndexLink}"/>
+                </p:panelGrid>  
             </h:form>
         </ui:define>
     </ui:composition>

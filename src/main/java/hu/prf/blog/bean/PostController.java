@@ -4,10 +4,17 @@ import hu.prf.blog.entity.Post;
 import hu.prf.blog.bean.util.JsfUtil;
 import hu.prf.blog.bean.util.PaginationHelper;
 import hu.prf.blog.bean.session.PostFacade;
+import hu.prf.blog.entity.Comment;
+import hu.prf.blog.entity.Posttaxonomy;
+import hu.prf.blog.entity.Taxonomy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.Set;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
@@ -17,6 +24,10 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
+import org.primefaces.event.CellEditEvent;
+import org.primefaces.model.tagcloud.DefaultTagCloudItem;
+import org.primefaces.model.tagcloud.DefaultTagCloudModel;
+import org.primefaces.model.tagcloud.TagCloudModel;
 
 @ManagedBean(name = "postController")
 @SessionScoped
@@ -186,6 +197,65 @@ public class PostController implements Serializable {
 
     public SelectItem[] getItemsAvailableSelectOne() {
         return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
+    }
+    
+    public void onCellEdit(CellEditEvent event) {  
+        Object oldValue = event.getOldValue();  
+        Object newValue = event.getNewValue();  
+          
+        if(newValue != null && !newValue.equals(oldValue)) {  
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);  
+            FacesContext.getCurrentInstance().addMessage(null, msg);  
+        }  
+    }  
+    
+    public String getTaxonomies(int id) {
+        Post current = (Post)items.getRowData();
+        Collection<Posttaxonomy> posttaxonomies = current.getPosttaxonomyCollection();
+        
+        StringBuilder sb = null;
+        for (Posttaxonomy posttaxonomy : posttaxonomies) {
+            if (sb == null) {
+                sb = new StringBuilder();
+                sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
+            }
+            sb.append(", ");
+            sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
+        }
+        System.out.println("-------------" + sb.toString());
+        return sb.toString();
+    }
+    
+    public Collection<Taxonomy> getTaxonomiesCollection(Post post) {
+        Collection<Posttaxonomy> posttaxonomies = post.getPosttaxonomyCollection();
+        
+        Collection<Taxonomy> result = new ArrayList<Taxonomy>();
+        for (Posttaxonomy posttaxonomy : posttaxonomies) {
+            result.add(posttaxonomy.getTaxonomyid());
+        }
+        return result;
+    }
+    
+    public TagCloudModel getTagsModel(Post post) {
+        Collection<Posttaxonomy> posttaxonomies = post.getPosttaxonomyCollection();
+        
+        TagCloudModel model = new DefaultTagCloudModel();
+        for (Posttaxonomy posttaxonomy : posttaxonomies) {
+            model.addTag(new DefaultTagCloudItem(posttaxonomy.getTaxonomyid().getCategoryname(), 1));
+        }
+        return model;
+    }
+    
+    public Collection<Comment> getComments(Post post) {
+        //Set<Comment> comments = ((Post)items.getRowData()).getCommentCollection();
+        Collection<Comment> comments = post.getCommentCollection();
+        for (Comment comment : comments) {
+            System.out.println("-+-+-+-+-+-+-+ CID " + comment.getId());
+            System.out.println("-+-+-+-+-+-+-+ CID un " + comment.getUserid().getUsername());
+            System.out.println("-+-+-+-+-+-+-+ CID c " + comment.getComment());
+            System.out.println("-+-+-+-+-+-+-+ CID d " + comment.getDate());
+        }
+        return comments;
     }
 
     @FacesConverter(forClass = Post.class)
