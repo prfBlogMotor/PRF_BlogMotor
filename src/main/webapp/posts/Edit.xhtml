@@ -16,14 +16,24 @@
             </h:panelGroup>
             <h:form>
                 <h1></h1>
-                <h:outputText value="Title: " />  
+                <h:outputText value="Title:  " />  
                 <p:inplace id="ajaxInplace" editor="true">  
                 <p:inputText value="#{postController.selected.title}"  
                             required="true" label="text"/>  
                 </p:inplace>  
                 
-                <p:editor id="editor" value="#{postController.selected.text}" style="width: 100%"/>
-           
+                <br/>
+                <br/>
+                
+                <div style="width: 100%; min-height: 300px; border-style: solid; border-width: 1px; border-color: black;">
+                    <p:inplace id="textInplace" editor="true">  
+                        <p:inputText value="#{postController.selected.text}" style="width: 100%; min-height: 300px;"  
+                            required="true" label="text"/>
+                    </p:inplace>
+                </div>
+                
+                
+                
             </h:form>
         </ui:define>
         
@@ -55,6 +65,30 @@
                 
                 </p:dataTable>
                 
+                <h:dataTable value="#{taxonomyController.items}" var="item" border="0" cellpadding="2" cellspacing="0" rowClasses="jsfcrud_odd_row,jsfcrud_even_row" rules="all" style="border:solid 1px">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListTaxonomyTitle_id}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.id}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListTaxonomyTitle_categoryname}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.categoryname}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;"/>
+                            </f:facet>
+                            <h:commandLink action="#{taxonomyController.prepareView}" value="#{bundle.ListTaxonomyViewLink}"/>
+                            <h:outputText value=" "/>
+                            <h:commandLink action="#{taxonomyController.prepareEdit}" value="#{bundle.ListTaxonomyEditLink}"/>
+                            <h:outputText value=" "/>
+                            <h:commandLink action="#{taxonomyController.destroy}" value="#{bundle.ListTaxonomyDestroyLink}"/>
+                        </h:column>
+                    </h:dataTable>
                 
             </h:form>
         </ui:define>

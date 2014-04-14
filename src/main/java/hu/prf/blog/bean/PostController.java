@@ -10,7 +10,9 @@ import hu.prf.blog.entity.Taxonomy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -86,11 +88,14 @@ public class PostController implements Serializable {
 
     public String prepareCreate() {
         current = new Post();
+        current.setTitle("Insert title here!");
+        current.setText("Insert post here!");
         selectedItemIndex = -1;
         return "Create";
     }
 
     public String create() {
+        current.setDate(Calendar.getInstance().getTime());
         try {
             getFacade().create(current);
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
@@ -110,6 +115,7 @@ public class PostController implements Serializable {
     public String update() {
         try {
             getFacade().edit(current);
+            System.out.println("******** " + current.getText());
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostUpdated"));
             return "View";
         } catch (Exception e) {
@@ -249,12 +255,6 @@ public class PostController implements Serializable {
     public Collection<Comment> getComments(Post post) {
         //Set<Comment> comments = ((Post)items.getRowData()).getCommentCollection();
         Collection<Comment> comments = post.getCommentCollection();
-        for (Comment comment : comments) {
-            System.out.println("-+-+-+-+-+-+-+ CID " + comment.getId());
-            System.out.println("-+-+-+-+-+-+-+ CID un " + comment.getUserid().getUsername());
-            System.out.println("-+-+-+-+-+-+-+ CID c " + comment.getComment());
-            System.out.println("-+-+-+-+-+-+-+ CID d " + comment.getDate());
-        }
         return comments;
     }
 
