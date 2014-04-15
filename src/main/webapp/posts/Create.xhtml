@@ -35,18 +35,12 @@
                 <br/>
                 <br/>
 
-                <h:outputLabel value="Tags" for="acSimple" style="margin: 0 10px 0 0" />
-                <p:autoComplete id="acSimple" value="#{postController.currentTaxonomy}" completeMethod="#{postController.complete}">
-                    <p:ajax event="itemSelect" listener="#{postController.handleSelect}" update="taxonomiesList" />
-                </p:autoComplete>
-                <p:commandButton value="Save" actionListener="#{postController.addNewTaxonomy}" process="@this" update="taxonomiesList" />
-
-                <br/>
+                <h:outputText value="Taxonomies:  " />  
+                <p:inplace id="ajaxInplaceTags" editor="true" style="width: 70%;" emptyLabel="Insert taxonomies here! Separate them with ','.">  
+                    <p:inputText value="#{postController.currentTaxonomy}"  
+                                 required="true" label="text" />  
+                </p:inplace>
                 
-                <p:dataList id="taxonomiesList" value="#{postController.taxonomies}" var="tag" itemType="disc">
-                    <h:outputLabel value="#{tag.categoryname}" />
-                </p:dataList>
-
             </h:form>
         </ui:define>
 

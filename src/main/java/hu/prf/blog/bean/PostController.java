@@ -5,6 +5,7 @@ import hu.prf.blog.entity.Post;
 import hu.prf.blog.bean.util.JsfUtil;
 import hu.prf.blog.bean.util.PaginationHelper;
 import hu.prf.blog.bean.session.PostFacade;
+import hu.prf.blog.bean.session.PosttaxonomyFacade;
 import hu.prf.blog.bean.session.TaxonomyFacade;
 import hu.prf.blog.entity.Comment;
 import hu.prf.blog.entity.Posttaxonomy;
@@ -49,6 +50,8 @@ public class PostController implements Serializable {
     private CommentFacade commentFacade;
     @EJB
     private TaxonomyFacade taxonomyFacade;
+    @EJB
+    private PosttaxonomyFacade postTaxonomyFacade;
     private PaginationHelper pagination;
     private int selectedItemIndex;
     private Comment lastComment;
@@ -130,11 +133,29 @@ public class PostController implements Serializable {
         current.setDate(Calendar.getInstance().getTime());
         try {
             getFacade().create(current);
+            saveTaxonomies();
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
             return prepareCreate();
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
             return null;
+        }
+    }
+    
+    private void saveTaxonomies() {
+        if (taxonomies == null) taxonomies = new ArrayList<Taxonomy>();
+        
+        String[] splitted = currentTaxonomy.split(",");
+        for (String string : splitted) {
+            Taxonomy tag = new Taxonomy();
+            tag.setCategoryname(string.trim());
+            taxonomies.add(tag);
+            taxonomyFacade.create(tag);
+            
+            Posttaxonomy pt = new Posttaxonomy();
+            pt.setPostid(current);
+            pt.setTaxonomyid(tag);
+            postTaxonomyFacade.create(pt);
         }
     }
 
