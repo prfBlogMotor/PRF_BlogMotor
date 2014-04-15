@@ -33,6 +33,14 @@
                 </div>
                 
                 
+                <br/>
+                <br/>
+
+                <h:outputText value="Taxonomies:  " />  
+                <p:inplace id="ajaxInplaceTags" editor="true" style="width: 70%;" emptyLabel="Insert taxonomies here! Separate them with ','.">  
+                    <p:inputText value="#{postController.currentTaxonomy}"  
+                                 required="true" label="text" />  
+                </p:inplace>
                 
             </h:form>
         </ui:define>
@@ -49,46 +57,6 @@
                     <h:commandLink action="#{postController.prepareList}" value="#{bundle.EditPostShowAllLink}" immediate="true"/>
                     <h:link outcome="/index" value="#{bundle.EditPostIndexLink}" />
                 </p:panelGrid>
-                
-                <br />
-                
-                <p:dataTable id="cars" var="tag" value="#{postController.getTaxonomiesCollection(postController.selected)}" editable="true" editMode="cell" widgetVar="carsTable" style="width: 100%">
-                    
-                    <p:ajax event="cellEdit" listener="#{postController.onCellEdit}" update=":form:messages" />
-                    
-                    <p:column headerText="Tags">  
-                        <p:cellEditor>  
-                            <f:facet name="output"><h:outputText value="#{tag.categoryname}" /></f:facet>  
-                            <f:facet name="input"><p:inputText id="modelInput" value="#{car.model}" style="width:96%"/></f:facet>  
-                        </p:cellEditor>  
-                    </p:column>
-                
-                </p:dataTable>
-                
-                <h:dataTable value="#{taxonomyController.items}" var="item" border="0" cellpadding="2" cellspacing="0" rowClasses="jsfcrud_odd_row,jsfcrud_even_row" rules="all" style="border:solid 1px">
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListTaxonomyTitle_id}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.id}"/>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListTaxonomyTitle_categoryname}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.categoryname}"/>
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">
-                                <h:outputText value="&nbsp;"/>
-                            </f:facet>
-                            <h:commandLink action="#{taxonomyController.prepareView}" value="#{bundle.ListTaxonomyViewLink}"/>
-                            <h:outputText value=" "/>
-                            <h:commandLink action="#{taxonomyController.prepareEdit}" value="#{bundle.ListTaxonomyEditLink}"/>
-                            <h:outputText value=" "/>
-                            <h:commandLink action="#{taxonomyController.destroy}" value="#{bundle.ListTaxonomyDestroyLink}"/>
-                        </h:column>
-                    </h:dataTable>
                 
             </h:form>
         </ui:define>

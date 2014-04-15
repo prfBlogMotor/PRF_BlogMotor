@@ -145,30 +145,53 @@ public class PostController implements Serializable {
     private void saveTaxonomies() {
         if (taxonomies == null) taxonomies = new ArrayList<Taxonomy>();
         
+        Collection<Taxonomy> tags = getTaxonomiesCollection(current);
+        
         String[] splitted = currentTaxonomy.split(",");
         for (String string : splitted) {
-            Taxonomy tag = new Taxonomy();
-            tag.setCategoryname(string.trim());
-            taxonomies.add(tag);
-            taxonomyFacade.create(tag);
+            boolean isPersisted = false;
+            for (Taxonomy taxonomy : tags) {
+                if (string == taxonomy.getCategoryname())
+                    isPersisted = true;
+            }
             
-            Posttaxonomy pt = new Posttaxonomy();
-            pt.setPostid(current);
-            pt.setTaxonomyid(tag);
-            postTaxonomyFacade.create(pt);
+            if (!isPersisted) {
+                Taxonomy tag = new Taxonomy();
+                tag.setCategoryname(string.trim());
+                taxonomies.add(tag);
+                taxonomyFacade.create(tag);
+
+                Posttaxonomy pt = new Posttaxonomy();
+                pt.setPostid(current);
+                pt.setTaxonomyid(tag);
+                postTaxonomyFacade.create(pt);
+            }
         }
     }
 
     public String prepareEdit() {
         current = (Post) getItems().getRowData();
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
+        
+        StringBuilder sb = null;
+        for (Taxonomy taxonomy : getTaxonomiesCollection(current)) {
+            if (sb == null) {
+                sb = new StringBuilder();
+                sb.append(taxonomy.getCategoryname());
+            } else {
+                sb.append(", ")
+                  .append(taxonomy.getCategoryname());
+            }
+        }
+        currentTaxonomy = sb.toString();
+        
         return "Edit";
     }
 
     public String update() {
         try {
+            saveTaxonomies();
             getFacade().edit(current);
-            System.out.println("******** " + current.getText());
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostUpdated"));
             return "View";
         } catch (Exception e) {
