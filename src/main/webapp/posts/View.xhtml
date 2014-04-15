@@ -31,6 +31,15 @@
                     </p:panel>
                 </p:dataGrid>
                 
+                <p:panel header="#{postController.lastComment.userid.username}">
+                    <p:inplace id="textInplace" editor="true" emptyLabel="Insert comment here!">  
+                        <p:inputText value="#{postController.lastComment.comment}" style="width: 100%; min-height: 300px; text-align: left"  
+                            required="true" label="text"/>
+                    </p:inplace>
+                    <br/>
+                    <p:commandButton value="Save" action="#{postController.saveLastComment()}" />
+                </p:panel>
+                
             </h:form>
         </ui:define>
         

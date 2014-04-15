@@ -4,8 +4,13 @@ import hu.prf.blog.entity.Taxonomy;
 import hu.prf.blog.bean.util.JsfUtil;
 import hu.prf.blog.bean.util.PaginationHelper;
 import hu.prf.blog.bean.session.TaxonomyFacade;
+import hu.prf.blog.entity.Post;
+import hu.prf.blog.entity.Posttaxonomy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
@@ -17,6 +22,9 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
+import org.primefaces.model.tagcloud.DefaultTagCloudItem;
+import org.primefaces.model.tagcloud.DefaultTagCloudModel;
+import org.primefaces.model.tagcloud.TagCloudModel;
 
 @ManagedBean(name = "taxonomyController")
 @SessionScoped
@@ -187,6 +195,18 @@ public class TaxonomyController implements Serializable {
     public SelectItem[] getItemsAvailableSelectOne() {
         return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
     }
+
+    public TagCloudModel getTagsModel() {
+        List<Taxonomy> tags = getFacade().findAll();
+
+        TagCloudModel model = new DefaultTagCloudModel();
+        for (Taxonomy taxonomy : tags) {
+            model.addTag(new DefaultTagCloudItem(taxonomy.getCategoryname(), 1));
+        }
+        return model;
+    }
+
+    
 
     @FacesConverter(forClass = Taxonomy.class)
     public static class TaxonomyControllerConverter implements Converter {

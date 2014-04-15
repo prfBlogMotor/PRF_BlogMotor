@@ -10,6 +10,7 @@ import hu.prf.blog.entity.Taxonomy;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -29,4 +30,9 @@ public class TaxonomyFacade extends AbstractFacade<Taxonomy> {
         super(Taxonomy.class);
     }
     
+    public Taxonomy findByCategoryName(String categoryName) {
+        TypedQuery<Taxonomy> query =
+            em.createNamedQuery("Taxonomy.findByCategoryname", Taxonomy.class);
+        return query.setParameter("categoryname", categoryName).getSingleResult();
+    }
 }

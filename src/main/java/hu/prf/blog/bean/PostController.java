@@ -1,18 +1,22 @@
 package hu.prf.blog.bean;
 
+import hu.prf.blog.bean.session.CommentFacade;
 import hu.prf.blog.entity.Post;
 import hu.prf.blog.bean.util.JsfUtil;
 import hu.prf.blog.bean.util.PaginationHelper;
 import hu.prf.blog.bean.session.PostFacade;
+import hu.prf.blog.bean.session.TaxonomyFacade;
 import hu.prf.blog.entity.Comment;
 import hu.prf.blog.entity.Posttaxonomy;
 import hu.prf.blog.entity.Taxonomy;
 
 import java.io.Serializable;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -23,10 +27,12 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
+import javax.faces.event.ActionEvent;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
 import org.primefaces.event.CellEditEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.tagcloud.DefaultTagCloudItem;
 import org.primefaces.model.tagcloud.DefaultTagCloudModel;
 import org.primefaces.model.tagcloud.TagCloudModel;
@@ -39,8 +45,16 @@ public class PostController implements Serializable {
     private DataModel items = null;
     @EJB
     private hu.prf.blog.bean.session.PostFacade ejbFacade;
+    @EJB
+    private CommentFacade commentFacade;
+    @EJB
+    private TaxonomyFacade taxonomyFacade;
     private PaginationHelper pagination;
     private int selectedItemIndex;
+    private Comment lastComment;
+
+    private List<Taxonomy> taxonomies;
+    private String currentTaxonomy;
 
     public PostController() {
     }
@@ -51,6 +65,26 @@ public class PostController implements Serializable {
             selectedItemIndex = -1;
         }
         return current;
+    }
+
+    public Comment getLastComment() {
+        return lastComment;
+    }
+
+    public void setLastComment(Comment lastComment) {
+        this.lastComment = lastComment;
+    }
+
+    private String saveLastComment() {
+        lastComment.setDate(Calendar.getInstance().getTime());
+        try {
+            commentFacade.create(lastComment);
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
+            return null;
+        } catch (Exception e) {
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            return null;
+        }
     }
 
     private PostFacade getFacade() {
@@ -88,8 +122,6 @@ public class PostController implements Serializable {
 
     public String prepareCreate() {
         current = new Post();
-        current.setTitle("Insert title here!");
-        current.setText("Insert post here!");
         selectedItemIndex = -1;
         return "Create";
     }
@@ -204,58 +236,156 @@ public class PostController implements Serializable {
     public SelectItem[] getItemsAvailableSelectOne() {
         return JsfUtil.getSelectItems(ejbFacade.findAll(), true);
     }
-    
-    public void onCellEdit(CellEditEvent event) {  
-        Object oldValue = event.getOldValue();  
-        Object newValue = event.getNewValue();  
-          
-        if(newValue != null && !newValue.equals(oldValue)) {  
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);  
-            FacesContext.getCurrentInstance().addMessage(null, msg);  
-        }  
-    }  
-    
+
+    public void onCellEdit(CellEditEvent event) {
+        Object oldValue = event.getOldValue();
+        Object newValue = event.getNewValue();
+
+        if (newValue != null && !newValue.equals(oldValue)) {
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+    }
+
     public String getTaxonomies(int id) {
-        Post current = (Post)items.getRowData();
+        Post current = (Post) items.getRowData();
+        if (current == null) {
+            return "";
+        }
         Collection<Posttaxonomy> posttaxonomies = current.getPosttaxonomyCollection();
-        
+        if (posttaxonomies == null || posttaxonomies.size() == 0) {
+            return "";
+        }
+
         StringBuilder sb = null;
         for (Posttaxonomy posttaxonomy : posttaxonomies) {
+            if (posttaxonomy.getTaxonomyid() == null
+                    || posttaxonomy.getTaxonomyid().getCategoryname() == null) {
+                continue;
+            }
             if (sb == null) {
                 sb = new StringBuilder();
                 sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
+            } else {
+                sb.append(", ");
+                sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
             }
-            sb.append(", ");
-            sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
         }
         System.out.println("-------------" + sb.toString());
         return sb.toString();
     }
-    
+
     public Collection<Taxonomy> getTaxonomiesCollection(Post post) {
         Collection<Posttaxonomy> posttaxonomies = post.getPosttaxonomyCollection();
-        
+
         Collection<Taxonomy> result = new ArrayList<Taxonomy>();
         for (Posttaxonomy posttaxonomy : posttaxonomies) {
             result.add(posttaxonomy.getTaxonomyid());
         }
         return result;
     }
-    
+
     public TagCloudModel getTagsModel(Post post) {
         Collection<Posttaxonomy> posttaxonomies = post.getPosttaxonomyCollection();
-        
+
         TagCloudModel model = new DefaultTagCloudModel();
         for (Posttaxonomy posttaxonomy : posttaxonomies) {
             model.addTag(new DefaultTagCloudItem(posttaxonomy.getTaxonomyid().getCategoryname(), 1));
         }
         return model;
     }
-    
+
     public Collection<Comment> getComments(Post post) {
         //Set<Comment> comments = ((Post)items.getRowData()).getCommentCollection();
         Collection<Comment> comments = post.getCommentCollection();
+        lastComment = new Comment();
+        lastComment.setPostid(current);
+        comments.add(lastComment);
         return comments;
+    }
+
+    public void handleSelect(SelectEvent event) {
+        if (taxonomies == null) 
+            taxonomies = new ArrayList<Taxonomy>();
+        String tag = event.getObject().toString();
+        System.out.println("*-*-*-*-: TTAAGGG: " + tag);
+        
+        Taxonomy taxonomy = taxonomyFacade.findByCategoryName(tag);
+        taxonomies.add(taxonomy);
+        currentTaxonomy = null;
+    }
+    
+    public List<String> getAllTaxonomyText() {
+        List<Taxonomy> tags = taxonomyFacade.findAll();
+
+        List<String> result = new ArrayList<String>();
+        for (Taxonomy taxonomy : tags) {
+            System.out.println("*-*-*- Taxonomy: " + taxonomy.getCategoryname());
+            result.add(taxonomy.getCategoryname());
+        }
+        return result;
+    }
+
+    public List<String> complete(String query) {
+        System.out.println(" CCOOMMPPLLEETT " + query);
+        List<String> results = new ArrayList<String>();
+
+        for (String tag : getAllTaxonomyText()) {
+            if (tag.startsWith(query))
+                results.add(tag);
+        }
+
+        return results;
+    }
+    
+    public void addNewTaxonomy(ActionEvent event) {
+        System.out.println(" -------- ADDNEWTAG --------: " + event.toString());
+        if (taxonomies == null) 
+            taxonomies = new ArrayList<Taxonomy>();
+        
+        String value = FacesContext.getCurrentInstance().
+		getExternalContext().getRequestParameterMap().get(":rightForm:acSimple");
+        System.out.println("WWWW: " + value);
+        
+        Taxonomy tag = new Taxonomy();
+        tag.setCategoryname(event.getSource().toString());
+        taxonomies.add(tag);
+        currentTaxonomy = null;
+    }
+    
+    public void getText(String text) {
+        String value = FacesContext.getCurrentInstance().
+		getExternalContext().getRequestParameterMap().get(":rightForm:acSimple");
+        System.out.println("WWWW: " + value);
+        currentTaxonomy = value;
+    }
+
+    /**
+     * @return the taxonomies
+     */
+    public List<Taxonomy> getTaxonomies() {
+        return taxonomies;
+    }
+
+    /**
+     * @param taxonomies the taxonomies to set
+     */
+    public void setTaxonomies(List<Taxonomy> taxonomies) {
+        this.taxonomies = taxonomies;
+    }
+
+    /**
+     * @return the currentTaxonomy
+     */
+    public String getCurrentTaxonomy() {
+        return currentTaxonomy;
+    }
+
+    /**
+     * @param currentTaxonomy the currentTaxonomy to set
+     */
+    public void setCurrentTaxonomy(String currentTaxonomy) {
+        this.currentTaxonomy = currentTaxonomy;
     }
 
     @FacesConverter(forClass = Post.class)

@@ -48,9 +48,9 @@
                                             </p:row>
 
                                             <p:row>
-                                                <p:column><h:commandLink action="#{postController.prepareView}" value="#{bundle.ListPostViewLink}"/></p:column>
-                                                <p:column><h:commandLink action="#{postController.prepareEdit}" value="#{bundle.ListPostEditLink}"/></p:column>
-                                                <p:column><h:commandLink action="#{postController.destroy}" value="#{bundle.ListPostDestroyLink}"/></p:column>
+                                                <p:column style="margin: 0 5px"><h:commandLink action="#{postController.prepareView}" value="#{bundle.ListPostViewLink}"/></p:column>
+                                                <p:column style="margin: 0 5px"><h:commandLink action="#{postController.prepareEdit}" value="#{bundle.ListPostEditLink}"/></p:column>
+                                                <p:column style="margin: 0 5px"><h:commandLink action="#{postController.destroy}" value="#{bundle.ListPostDestroyLink}"/></p:column>
                                             </p:row>
                                         </h:panelGrid>
                                     </td>
@@ -67,8 +67,11 @@
                 <p:panelGrid columns="1" style="width: 100%">
                     <f:facet name="header">Commands</f:facet>  
                     <h:commandLink action="#{postController.prepareCreate}" value="#{bundle.ListPostCreateLink}"/>
-                    <h:link outcome="/index" value="#{bundle.ListPostIndexLink}"/>
-                </p:panelGrid>  
+                </p:panelGrid>
+                
+                <br/>
+                
+                <p:tagCloud model="#{taxonomyController.tagsModel}" style="width: 100%"/>
             </h:form>
         </ui:define>
     </ui:composition>
