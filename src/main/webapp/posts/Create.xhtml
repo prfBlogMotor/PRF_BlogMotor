@@ -50,14 +50,10 @@
                 <p:growl id="messages" showDetail="true"/>
 
                 <p:panelGrid columns="1" style="width: 100%">
-                    <h:commandLink action="#{postController.create}" value="#{bundle.CreatePostSaveLink}" />
+                    <h:commandLink action="#{postController.create(loginController.current)}" value="#{bundle.CreatePostSaveLink}" />
                     <h:commandLink action="#{postController.prepareList}" value="#{bundle.CreatePostShowAllLink}" immediate="true"/>
                     <h:link outcome="/index" value="#{bundle.CreatePostIndexLink}"/>
                 </p:panelGrid>
-
-                <br />
-
-
 
             </h:form>
         </ui:define>

@@ -7,9 +7,16 @@
 package hu.prf.blog.bean.session;
 
 import hu.prf.blog.entity.Posttaxonomy;
+import hu.prf.blog.entity.Taxonomy;
+import hu.prf.blog.entity.User;
+import java.util.Collection;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 /**
  *
@@ -29,4 +36,14 @@ public class PosttaxonomyFacade extends AbstractFacade<Posttaxonomy> {
         super(Posttaxonomy.class);
     }
     
+    public Collection<Posttaxonomy> findAllPostTaxonomiesByTaxonomy(Taxonomy taxonomy) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery cq = cb.createQuery();
+        Root<Posttaxonomy> u = cq.from(Posttaxonomy.class);
+        cq.select(u);
+        cq.where(cb.equal(u.get("taxonomyid"), taxonomy.getId()));
+
+        List results = em.createQuery(cq).getResultList();
+        return results;
+    }
 }

@@ -65,6 +65,11 @@ public class LoginController implements Serializable {
         return "posts/List?faces-redirect=true";
     }
     
+    public String logout() {
+        current = null;
+        return "/Login?faces-redirect=true";
+    }
+    
     public String navigateHomePage() {
         return "posts/List?faces-redirect=true";
     }

@@ -2,7 +2,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:h="http://java.sun.com/jsf/html">
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
 
     <h:head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -14,6 +15,11 @@
         <div class="wrapper">
             <div class="header">
                 <ui:insert name="title">Top Section</ui:insert>
+                <div style="float: right; margin-right: 20px;">
+                    <p:outputLabel value="Hello, #{loginController.current.username}" rendered="#{loginController.current != null}" style="margin-right: 20px;" />
+                    <p:commandLink value="Login" action="/Login?faces-redirect=true" rendered="#{loginController.current == null}" />
+                    <p:commandLink value="Logout" action="#{loginController.logout()}" rendered="#{loginController.current != null}" />
+                </div>
             </div>
             <div class="middle">
                 <div class="container">

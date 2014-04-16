@@ -48,9 +48,9 @@
                                             </p:row>
 
                                             <p:row>
-                                                <p:column style="margin: 0 5px"><h:commandLink action="#{postController.prepareView}" value="#{bundle.ListPostViewLink}"/></p:column>
-                                                <p:column style="margin: 0 5px"><h:commandLink action="#{postController.prepareEdit}" value="#{bundle.ListPostEditLink}"/></p:column>
-                                                <p:column style="margin: 0 5px"><h:commandLink action="#{postController.destroy}" value="#{bundle.ListPostDestroyLink}"/></p:column>
+                                                <p:column><h:commandLink action="#{postController.prepareView}" value="#{bundle.ListPostViewLink}" style="margin: 0 5px"/></p:column>
+                                                <p:column><h:commandLink action="#{postController.prepareEdit}" value="#{bundle.ListPostEditLink}" rendered="#{loginController.current.equals(item.userid)}" style="margin: 0 5px"/></p:column>
+                                                <p:column><h:commandLink action="#{postController.destroy}" value="#{bundle.ListPostDestroyLink}" rendered="#{loginController.current.equals(item.userid)}" style="margin: 0 5px"/></p:column>
                                             </p:row>
                                         </h:panelGrid>
                                     </td>

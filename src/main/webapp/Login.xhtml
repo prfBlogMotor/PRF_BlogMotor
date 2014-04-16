@@ -13,8 +13,8 @@
         <ui:define name="body">
 
             <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" />
-            
-            <h:form>
+
+            <h:form class="form">
                 <p:panelGrid columns="2">
 
                     <f:facet name="header">
@@ -29,7 +29,10 @@
                     <p:inputText required="true" label="pw"  
                                  value="#{loginController.password}" /> 
 
-                    <p:commandButton value="Login" action="#{loginController.login()}" />
+                    
+                    <f:facet name="footer">  
+                        <p:commandButton value="Login" action="#{loginController.login()}" />
+                    </f:facet>  
                 </p:panelGrid>
             </h:form>
 

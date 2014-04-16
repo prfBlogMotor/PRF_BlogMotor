@@ -10,6 +10,7 @@ import hu.prf.blog.bean.session.TaxonomyFacade;
 import hu.prf.blog.entity.Comment;
 import hu.prf.blog.entity.Posttaxonomy;
 import hu.prf.blog.entity.Taxonomy;
+import hu.prf.blog.entity.User;
 
 import java.io.Serializable;
 import java.util.AbstractList;
@@ -132,7 +133,25 @@ public class PostController implements Serializable {
     public String create() {
         current.setDate(Calendar.getInstance().getTime());
         try {
+            System.out.println("---- POST CREATE");
             getFacade().create(current);
+            System.out.println("---- POST CREATE - SAVE TAXES");
+            saveTaxonomies();
+            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
+            return prepareCreate();
+        } catch (Exception e) {
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            return null;
+        }
+    }
+    
+    public String create(User user) {
+        current.setDate(Calendar.getInstance().getTime());
+        current.setUserid(user);
+        try {
+            System.out.println("---- POST CREATE");
+            getFacade().create(current);
+            System.out.println("---- POST CREATE - SAVE TAXES");
             saveTaxonomies();
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
             return prepareCreate();
@@ -151,9 +170,14 @@ public class PostController implements Serializable {
         for (String string : splitted) {
             boolean isPersisted = false;
             for (Taxonomy taxonomy : tags) {
-                if (string == taxonomy.getCategoryname())
+                String tag = taxonomy.getCategoryname();
+                if (string.equalsIgnoreCase(tag)) {
                     isPersisted = true;
+                    break;
+                }
             }
+            
+            // TODO, ha más post cimkéjét adjuk meg, akkor azokat is járja be és hozzon létre új posttaxonomy-kat...
             
             if (!isPersisted) {
                 Taxonomy tag = new Taxonomy();
@@ -224,6 +248,19 @@ public class PostController implements Serializable {
 
     private void performDestroy() {
         try {
+            Collection<Posttaxonomy> postTaxonomies = current.getPosttaxonomyCollection();
+            Collection<Taxonomy> taxonomiesCollection = new ArrayList<Taxonomy>();
+            for (Posttaxonomy posttaxonomy : postTaxonomies) {
+                taxonomiesCollection.add(posttaxonomy.getTaxonomyid());
+                postTaxonomyFacade.remove(posttaxonomy);
+            }
+            
+            for (Taxonomy taxonomy : taxonomiesCollection) {
+                if (postTaxonomyFacade.findAllPostTaxonomiesByTaxonomy(taxonomy).size() <= 1)
+                    taxonomyFacade.remove(taxonomy);
+            }
+            
+            current.setPosttaxonomyCollection(null);
             getFacade().remove(current);
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostDeleted"));
         } catch (Exception e) {
@@ -321,6 +358,7 @@ public class PostController implements Serializable {
 
     public Collection<Taxonomy> getTaxonomiesCollection(Post post) {
         Collection<Posttaxonomy> posttaxonomies = post.getPosttaxonomyCollection();
+        if (posttaxonomies == null) return new ArrayList<Taxonomy>();
 
         Collection<Taxonomy> result = new ArrayList<Taxonomy>();
         for (Posttaxonomy posttaxonomy : posttaxonomies) {
