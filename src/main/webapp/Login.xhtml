@@ -42,8 +42,8 @@
             <h:form>
                 <p:panelGrid columns="1" style="width: 100%">
                     <f:facet name="header">Commands</f:facet>
-                    <h:commandLink action="Register?faces-redirect=true" value="Register"/>
-                    <h:commandLink action="posts/List?faces-redirect=true" value="Home"/>
+                    <h:commandLink action="#{loginController.register()}" value="Register"/>
+                    <h:commandLink action="#{loginController.navigateHomePage()}" value="Home"/>
                 </p:panelGrid>
             </h:form>
         </ui:define>

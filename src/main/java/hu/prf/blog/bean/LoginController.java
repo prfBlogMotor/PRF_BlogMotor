@@ -7,8 +7,13 @@
 package hu.prf.blog.bean;
 
 import hu.prf.blog.bean.session.UserFacade;
+import hu.prf.blog.bean.session.VisitingFacade;
 import hu.prf.blog.entity.User;
+import hu.prf.blog.entity.Visiting;
+import java.beans.Visibility;
 import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -28,6 +33,8 @@ public class LoginController implements Serializable {
     
     @EJB
     private hu.prf.blog.bean.session.UserFacade ejbFacade;
+    @EJB
+    private VisitingFacade visitingFacade;
     
     public LoginController() {
     }
@@ -42,6 +49,7 @@ public class LoginController implements Serializable {
         
         if (current != null) {
             System.out.println(" --- LOGIN: " + current.getUsername());
+            createVisiting();
             return "posts/List?faces-redirect=true";
         }
         FacesContext.getCurrentInstance()
@@ -62,6 +70,9 @@ public class LoginController implements Serializable {
         current.setPassword(password);
         
         getFacade().create(current);
+        
+        createVisiting();
+        
         return "posts/List?faces-redirect=true";
     }
     
@@ -70,8 +81,33 @@ public class LoginController implements Serializable {
         return "/Login?faces-redirect=true";
     }
     
+    public String navigateLoginPage() {
+        return "/Login?faces-redirect=true";
+    }
+    
+    public String navigateRegisterPage() {
+        return "/Register?faces-redirect=true";
+    }
+    
+    private void createVisiting() {
+        Visiting visiting = new Visiting();
+        visiting.setUserid(current);
+        visiting.setDate(Calendar.getInstance().getTime());
+        visitingFacade.create(visiting);
+    }
+    
     public String navigateHomePage() {
+        current = getFacade().getUnknownUser();
+        createVisiting();
         return "posts/List?faces-redirect=true";
+    }
+    
+    public boolean isRenderingLoginButton() {
+        return current == null || UserFacade.isDefaultUser(current);
+    }
+    
+    public boolean isRenderingLogoutButton() {
+        return current != null || !UserFacade.isDefaultUser(current);
     }
 
     /**

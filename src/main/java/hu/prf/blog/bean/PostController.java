@@ -55,10 +55,13 @@ public class PostController implements Serializable {
     private PosttaxonomyFacade postTaxonomyFacade;
     private PaginationHelper pagination;
     private int selectedItemIndex;
+    
+    private Collection<Comment> comments;
     private Comment lastComment;
 
     private List<Taxonomy> taxonomies;
     private String currentTaxonomy;
+    
 
     public PostController() {
     }
@@ -79,11 +82,39 @@ public class PostController implements Serializable {
         this.lastComment = lastComment;
     }
 
-    private String saveLastComment() {
+    public String saveLastComment(User user) {
+        System.out.println(" *** SAVE LAST COMMENT");
         lastComment.setDate(Calendar.getInstance().getTime());
+        lastComment.setUserid(user);
+        lastComment.setPostid(current);
         try {
             commentFacade.create(lastComment);
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
+            if (comments != null) comments.add(lastComment);
+            lastComment = new Comment();
+            return null;
+        } catch (Exception e) {
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            return null;
+        }
+    }
+    
+    public String saveComment(Comment comment) {
+        System.out.println(" *** SAVE COMMENT");
+        comment.setDate(Calendar.getInstance().getTime());
+        try {
+            commentFacade.edit(comment);
+            return null;
+        } catch (Exception e) {
+            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+            return null;
+        }
+    }
+    
+    public String removeComment(Comment comment) {
+        System.out.println(" *** REMOVE COMMENT");
+        try {
+            commentFacade.remove(comment);
+            if (comments != null) comments.remove(comment);
             return null;
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
@@ -120,6 +151,8 @@ public class PostController implements Serializable {
 
     public String prepareView() {
         current = (Post) getItems().getRowData();
+        lastComment = new Comment();
+        lastComment.setPostid(current);
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         return "View";
     }
@@ -378,11 +411,7 @@ public class PostController implements Serializable {
     }
 
     public Collection<Comment> getComments(Post post) {
-        //Set<Comment> comments = ((Post)items.getRowData()).getCommentCollection();
-        Collection<Comment> comments = post.getCommentCollection();
-        lastComment = new Comment();
-        lastComment.setPostid(current);
-        comments.add(lastComment);
+        comments = post.getCommentCollection();
         return comments;
     }
 
