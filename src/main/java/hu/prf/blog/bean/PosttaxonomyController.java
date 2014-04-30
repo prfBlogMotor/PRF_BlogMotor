@@ -1,10 +1,9 @@
 package hu.prf.blog.bean;
 
-import hu.prf.blog.entity.Posttaxonomy;
+import hu.prf.blog.bean.session.PosttaxonomyFacade;
 import hu.prf.blog.bean.util.JsfUtil;
 import hu.prf.blog.bean.util.PaginationHelper;
-import hu.prf.blog.bean.session.PosttaxonomyFacade;
-
+import hu.prf.blog.entity.Posttaxonomy;
 import java.io.Serializable;
 import java.util.ResourceBundle;
 import javax.ejb.EJB;
@@ -17,6 +16,9 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.model.DataModel;
 import javax.faces.model.ListDataModel;
 import javax.faces.model.SelectItem;
+import org.primefaces.model.tagcloud.DefaultTagCloudItem;
+import org.primefaces.model.tagcloud.DefaultTagCloudModel;
+import org.primefaces.model.tagcloud.TagCloudModel;
 
 @ManagedBean(name = "posttaxonomyController")
 @SessionScoped

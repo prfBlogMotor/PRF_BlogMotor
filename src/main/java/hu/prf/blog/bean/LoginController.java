@@ -44,27 +44,27 @@ public class LoginController implements Serializable {
     }
     
     public String login() {
-        System.out.println(" --- LOGIN: ");
+        //System.out.println(" --- LOGIN: ");
         current = getFacade().GetUserIfAuthenticated(username, password);
-        
+        FacesContext context = FacesContext.getCurrentInstance();
         if (current != null) {
-            System.out.println(" --- LOGIN: " + current.getUsername());
+            context.addMessage(null, new FacesMessage(" Üdvözöllek, ", current.getUsername() + "!"));
             createVisiting();
-            return "posts/List?faces-redirect=true";
+            
+            return "success";
         }
-        FacesContext.getCurrentInstance()
-                .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error", "Wrong user name or password!"));
-        
+        context.addMessage(null, new FacesMessage(" Hiba ", "Nem megfelelő név vagy jelszó!"));
         return null;
     }
     
     public String register() {
-        System.out.println(" --- REGISTER: ");
+        //System.out.println(" --- REGISTER: ");
         if (username.isEmpty() || password.isEmpty()) {
             FacesContext.getCurrentInstance()
                 .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error", "User name and password are required!"));
             return null;
         }
+        
         current = new User();
         current.setUsername(username);
         current.setPassword(password);
@@ -72,13 +72,15 @@ public class LoginController implements Serializable {
         getFacade().create(current);
         
         createVisiting();
-        
-        return "posts/List?faces-redirect=true";
+        return "post/List?faces-redirect=true";
     }
     
     public String logout() {
+        //System.out.println(" Logout: ");
+        FacesContext context = FacesContext.getCurrentInstance();
         current = null;
-        return "/Login?faces-redirect=true";
+        context.addMessage(null, new FacesMessage(" Kijelentkezve. "));
+        return "success";
     }
     
     public String navigateLoginPage() {

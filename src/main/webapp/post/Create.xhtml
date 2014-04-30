@@ -3,43 +3,77 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-    <ui:composition template="/template.xhtml">
-        <ui:define name="title">
-            <h:outputText value="#{bundle.CreatePostTitle}"></h:outputText>
-        </ui:define>
+    <ui:composition template="/blogTemplate.xhtml">
         <ui:define name="body">
-            <h:panelGroup id="messagePanel" layout="block">
-                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
-            </h:panelGroup>
-            <h:form>
-                <h:panelGrid columns="2">
-                    <h:outputLabel value="#{bundle.CreatePostLabel_id}" for="id" />
-                    <h:inputText id="id" value="#{postController.selected.id}" title="#{bundle.CreatePostTitle_id}" required="true" requiredMessage="#{bundle.CreatePostRequiredMessage_id}"/>
-                    <h:outputLabel value="#{bundle.CreatePostLabel_title}" for="title" />
-                    <h:inputText id="title" value="#{postController.selected.title}" title="#{bundle.CreatePostTitle_title}" />
-                    <h:outputLabel value="#{bundle.CreatePostLabel_text}" for="text" />
-                    <h:inputText id="text" value="#{postController.selected.text}" title="#{bundle.CreatePostTitle_text}" />
-                    <h:outputLabel value="#{bundle.CreatePostLabel_date}" for="date" />
-                    <h:inputText id="date" value="#{postController.selected.date}" title="#{bundle.CreatePostTitle_date}" >
-                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
-                    </h:inputText>
-                    <h:outputLabel value="#{bundle.CreatePostLabel_userid}" for="userid" />
-                    <h:selectOneMenu id="userid" value="#{postController.selected.userid}" title="#{bundle.CreatePostTitle_userid}" >
-                        <f:selectItems value="#{userController.itemsAvailableSelectOne}"/>
-                    </h:selectOneMenu>
-                </h:panelGrid>
-                <br />
-                <h:commandLink action="#{postController.create}" value="#{bundle.CreatePostSaveLink}" />
-                <br />
-                <br />
-                <h:commandLink action="#{postController.prepareList}" value="#{bundle.CreatePostShowAllLink}" immediate="true"/>
-                <br />
-                <br />
-                <h:link outcome="/index" value="#{bundle.CreatePostIndexLink}"/>
-            </h:form>
+            <div class="content pure-u-3-5">
+                <div class="post pure-u-1">
+                    <h:form id="mainForm" class="pure-form pure-form-aligned">
+                        <fieldset>
+                            <div class="pure-control-group">
+                            <!--Cím-->
+                                <label for="title">Cím</label>
+                                <p:inputText id="title" type="text" placeholder="A poszt címe" 
+                                             value="#{postController.selected.title}"
+                                             required="true" style="width:600px"/>
+                            </div>
+                            <br/><br/>
+                            <!--Szöveg-->
+                            <div class="pure-control-group">
+                                <p:editor id="editor"
+                                             value="#{postController.selected.text}" />
+                            </div>
+                            <!--Tag-ek lista-->
+                            <p:panel id="up" header="Tag-ek">
+                                <p:growl id="growltag" showDetail="true" sticky="true" />
+                                <p:selectCheckboxMenu id="selectTaxonomy" style="text-decoration: none"
+                                                      value="#{postController.selectedTaxonomies}" 
+                                                      label="Válassz" 
+                                                      filter="true" filterMatchMode="startsWith">  
+                                    <f:selectItems value="#{postController.taxonomiesAsMap()}" />  
+                                </p:selectCheckboxMenu>  
+                                <br/>
+                                <br/>
+                            </p:panel>
+                            <br/>
+                            <!--Poszt mentese-->
+                            <h:commandButton styleClass="pure-button pure-button-active"
+                                    action="#{postController.create(loginController.current)}" 
+                                    value="#{hu_bundle.CreatePostSaveLink}" id="saveButton"/>
+                            <p:dialog modal="true" showEffect="fade" hideEffect="fade" widgetVar="dlg" resizable="false">  
+                                <p:dataList id="display" value="#{postController.selectedTaxonomies}" var="taxonomies">  
+                                    #{taxonomies}  
+                                </p:dataList>  
+                            </p:dialog>
+                        </fieldset>
+                    </h:form>
+                     <!--Új tag-->
+
+                    <p:lightBox>
+                        <h:outputLink value="#">
+                            <h:outputText value="Új tag" />
+                        </h:outputLink>
+                        <f:facet name="inline">
+                             <p:panel style="width: 300px">
+                                <h:form prependId="false">
+                                    <label for="taxName">Új tag</label>
+                                    <p:inputText id="taxName" type="text" placeholder="A tag neve" 
+                                             value="#{postController.taxonomyToCreate}"
+                                             style="width:100px"/>
+                                    <br/>
+                                    <p:commandButton value="Létrehoz" id="btnTax" process="@this,taxName"  
+                                        update="@([id*=up])"
+                                        actionListener="#{postController.makeTaxonomy(postController.taxonomyToCreate)}"/>
+                                </h:form>
+                            </p:panel>
+                        </f:facet>
+                    </p:lightBox>
+                </div>
+            </div>
         </ui:define>
+
     </ui:composition>
 
 </html>

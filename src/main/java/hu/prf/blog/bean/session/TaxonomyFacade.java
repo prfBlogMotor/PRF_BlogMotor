@@ -35,4 +35,10 @@ public class TaxonomyFacade extends AbstractFacade<Taxonomy> {
             em.createNamedQuery("Taxonomy.findByCategoryname", Taxonomy.class);
         return query.setParameter("categoryname", categoryName).getSingleResult();
     }
+    
+    public Taxonomy findById(Long categoryId) {
+        TypedQuery<Taxonomy> query =
+            em.createNamedQuery("Taxonomy.findById", Taxonomy.class);
+        return query.setParameter("id", categoryId).getSingleResult();
+    }
 }

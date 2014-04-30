@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <h:head>
+        <title>Blog</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.1.0/pure-min.css"/>
+        <h:outputStylesheet library="css" name="blog.css"/>
+    </h:head>
+    <h:body>
+        <div class="pure-g">
+            <div class="content pure-u-1-1">
+                <header class="pure-u-1-1" id="header">
+                    <hgroup>
+                        <h1>Blog 
+                            <h3> Programrendszerek fejlesztése </h3> 
+                        </h1>
+                    </hgroup>
+                </header>
+            <ui:insert name="body">Main Content</ui:insert>
+            <div class="sidebar pure-u-1-5">
+                <div class="sidebar">
+                    <c:choose>
+                    <c:when test="${loginController.current != null}">
+                        <fieldset>
+                        <legend>Bejelentkezve</legend>
+                            <p>#{loginController.current.username}</p>
+                            <h:form>
+                                <p:commandButton styleClass="pure-button pure-button-active"
+                                    value="Új poszt" 
+                                    action="#{postController.prepareCreate}" />
+                                <p:commandButton styleClass="pure-button pure-button-active"
+                                    value="Logout" 
+                                    action="#{loginController.logout}" />
+                            </h:form>
+                        </fieldset>
+                    </c:when>
+                    <c:otherwise>
+                    <fieldset>
+                        <legend>Login</legend>
+                        <h:form>
+                        <p:growl id="growlMessage" showDetail="true" sticky="true" />
+                            <p:panelGrid columns="2">
+                                <h:outputText value="Név: " />  
+                                <p:inputText required="true" label="un"  
+                                             value="#{loginController.username}" />  
+
+                                <h:outputText value="Jelszó: " />  
+                                <p:inputText required="true" label="pw"  
+                                             value="#{loginController.password}" /> 
+
+                                <p:commandButton styleClass="pure-button pure-button-active"
+                                    value="Login" 
+                                    action="#{loginController.login}" update="growlMessage" />
+                            </p:panelGrid>
+                        </h:form>
+                    </fieldset>
+                    </c:otherwise>
+                    </c:choose>
+                </div>
+                <div class="sidebar">
+                    <fieldset>
+                        <legend>Tagek</legend>
+                        <p:tagCloud model="#{taxonomyController.tagsModel}">
+
+                        </p:tagCloud>
+                    </fieldset>
+                </div>
+            </div>
+            </div>
+        </div>
+    </h:body>
+</html>

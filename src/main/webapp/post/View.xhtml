@@ -1,5 +1,77 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+    
+    <ui:composition template="/blogTemplate.xhtml">
+        <ui:define name="body">
+            <div class="content pure-u-3-5">
+                <div class="post pure-u-1">
+                <h:form styleClass="jsfcrud_list_form">
+                    <header class="post-header">
+                        <h1>
+                            #{postController.selected.title}
+                            <span href="#" class="post-date">#{postController.selected.date}</span>
+                        </h1>
+                        <p class="post-meta">
+                            Írta: 
+                            <a href="#" class="post-author">
+                                #{postController.selected.userid.username} @ 
+                            </a>
+                            <span class="post-tx"> #{postController.getTaxonomiesForView(postController.selected.id+1)} </span>
+                        </p>
+                    </header>
+                    <div class="post-desc">
+                        #{postController.selected.text}
+                    </div>
+                    <br/>
+                    <br/>
+                    <h1 class="section-header">
+                        Kommentek
+                    </h1>
+                    <h:form id="form" rendered="#{loginController.current != null}"> 
+                        <p:panel header="Új hozzászólás">
+                            <p:editor id="editor" value="#{postController.lastComment.comment}"/> 
+                            <h:panelGrid columns="2" style="margin-top:10px">  
+                                <p:commandButton value="Hozzászólok" id="btnForm" styleClass="pure-button"   
+                                                 actionListener="#{postController.saveLastComment(loginController.current)}" ajax="false"/>
+                            </h:panelGrid>
+
+                            <p:dialog header="Content" widgetVar="dlg" showEffect="fade" hideEffect="fade" modal="true">  
+                                <h:outputText id="display" value="#{postController.lastComment.comment}" escape="false" />  
+                            </p:dialog>  
+                        </p:panel>
+                    </h:form>
+                    
+                    <p:dataGrid id='comments' value="#{postController.getComments(postController.selected)}" var="item" columns="1" style="width: 80%; text-align: left;" >
+                        <p:panel header="#{item.userid.username}" rendered="#{item.comment != null}">
+                            <f:facet name="actions">
+                               <p:commandButton value="Törlöm" actionListener="#{postController.removeComment(item)}" update="comments" rendered="#{loginController.current.equals(item.userid)}" process="@this" />
+                            </f:facet>
+                            
+                            <h:outputText value="#{item.comment}" style="text-align: left"/>
+                        
+                        </p:panel>
+                    
+                    </p:dataGrid>
+                </h:form>
+                 
+                </div>
+            </div>
+            
+        </ui:define>
+    </ui:composition>
+
+</html>
+
+
+<!--<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
@@ -45,4 +117,4 @@
         </ui:define>
     </ui:composition>
 
-</html>
+</html>-->

@@ -1,24 +1,26 @@
 package hu.prf.blog.bean;
 
 import hu.prf.blog.bean.session.CommentFacade;
-import hu.prf.blog.entity.Post;
-import hu.prf.blog.bean.util.JsfUtil;
-import hu.prf.blog.bean.util.PaginationHelper;
 import hu.prf.blog.bean.session.PostFacade;
 import hu.prf.blog.bean.session.PosttaxonomyFacade;
 import hu.prf.blog.bean.session.TaxonomyFacade;
+import hu.prf.blog.bean.util.JsfUtil;
+import hu.prf.blog.bean.util.PaginationHelper;
 import hu.prf.blog.entity.Comment;
+import hu.prf.blog.entity.Post;
 import hu.prf.blog.entity.Posttaxonomy;
 import hu.prf.blog.entity.Taxonomy;
 import hu.prf.blog.entity.User;
-
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -60,9 +62,30 @@ public class PostController implements Serializable {
     private Comment lastComment;
 
     private List<Taxonomy> taxonomies;
-    private String currentTaxonomy;
-    
+    private List<String> selectedTaxonomies;
 
+    private String currentTaxonomy;
+    private String taxonomyToCreate;
+
+    public String getTaxonomyToCreate() {
+        return taxonomyToCreate;
+    }
+
+    public void setTaxonomyToCreate(String taxonomyToCreate) {
+        this.taxonomyToCreate = taxonomyToCreate;
+    }
+    public int currentViewId;
+    
+    public String changeToView() {
+        //System.out.println("Redirecting to view...");
+        current = (Post) getItems().getRowData();
+        lastComment = new Comment();
+        lastComment.setPostid(current);
+        selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
+        //System.out.println("selected: " + selectedItemIndex);
+        return "success";
+    }
+    
     public PostController() {
     }
 
@@ -83,7 +106,6 @@ public class PostController implements Serializable {
     }
 
     public String saveLastComment(User user) {
-        System.out.println(" *** SAVE LAST COMMENT");
         lastComment.setDate(Calendar.getInstance().getTime());
         lastComment.setUserid(user);
         lastComment.setPostid(current);
@@ -91,7 +113,8 @@ public class PostController implements Serializable {
             commentFacade.create(lastComment);
             if (comments != null) comments.add(lastComment);
             lastComment = new Comment();
-            return null;
+            System.out.println(" Comment elmentve");
+            return "post/View?faces-redirect=true";
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
             return null;
@@ -99,7 +122,7 @@ public class PostController implements Serializable {
     }
     
     public String saveComment(Comment comment) {
-        System.out.println(" *** SAVE COMMENT");
+        //System.out.println(" *** SAVE COMMENT");
         comment.setDate(Calendar.getInstance().getTime());
         try {
             commentFacade.edit(comment);
@@ -111,10 +134,12 @@ public class PostController implements Serializable {
     }
     
     public String removeComment(Comment comment) {
-        System.out.println(" *** REMOVE COMMENT");
+        //System.out.println(" *** REMOVE COMMENT");
         try {
             commentFacade.remove(comment);
             if (comments != null) comments.remove(comment);
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage("Komment törölve!"));
             return null;
         } catch (Exception e) {
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
@@ -146,10 +171,11 @@ public class PostController implements Serializable {
 
     public String prepareList() {
         recreateModel();
-        return "List";
+        return "List?faces-redirect=true";
     }
-
+    
     public String prepareView() {
+        //System.out.println("Changing view...");
         current = (Post) getItems().getRowData();
         lastComment = new Comment();
         lastComment.setPostid(current);
@@ -158,18 +184,27 @@ public class PostController implements Serializable {
     }
 
     public String prepareCreate() {
+        System.out.println("@PostController/prepareCreate");
         current = new Post();
         selectedItemIndex = -1;
         return "Create";
     }
-
+    
+    public String prepareAfterCreate() {
+        System.out.println("@PostController/prepareAfterCreate");
+        current = new Post();
+        selectedItemIndex = -1;
+        return "navigate_to_list";
+    }
+    
     public String create() {
         current.setDate(Calendar.getInstance().getTime());
         try {
-            System.out.println("---- POST CREATE");
+            //System.out.println("---- POST CREATE");
             getFacade().create(current);
-            System.out.println("---- POST CREATE - SAVE TAXES");
+            //System.out.println("---- POST CREATE - SAVE TAXES");
             saveTaxonomies();
+            
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
             return prepareCreate();
         } catch (Exception e) {
@@ -182,16 +217,65 @@ public class PostController implements Serializable {
         current.setDate(Calendar.getInstance().getTime());
         current.setUserid(user);
         try {
-            System.out.println("---- POST CREATE");
+            
+//            saveTaxonomies();
+            System.out.println("@PostController/create");
             getFacade().create(current);
-            System.out.println("---- POST CREATE - SAVE TAXES");
-            saveTaxonomies();
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
-            return prepareCreate();
+            System.out.println("@PostController/create - tax save");
+            addTaxonomies();
+//            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
+//            return prepareCreate();
+            
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage("Az új poszt létrehozva", current.getTitle()));
+//            return "success";
+            return prepareList();
         } catch (Exception e) {
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage("Hiba: "+ ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured")));
             JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
             return null;
         }
+    }
+    
+    public Map<String, Long> taxonomiesAsMap() {
+        List<Taxonomy> tags = taxonomyFacade.findAll();
+        Map<String, Long> mapForCheckboxMenu = new HashMap<String, Long>();
+        
+        for(Taxonomy tax : tags) {
+            mapForCheckboxMenu.put(tax.getCategoryname(), tax.getId());
+        }
+        return mapForCheckboxMenu;
+    }
+    
+    private void addTaxonomies() {
+        System.out.println("Taxonomy hozzaadasa");
+        for(String tax:selectedTaxonomies) {
+//            System.out.println(Long.parseLong(tax));
+            Taxonomy t = taxonomyFacade.findById(Long.parseLong(tax));
+            System.out.println(t.getCategoryname());
+            Posttaxonomy pt = new Posttaxonomy();
+            pt.setPostid(current);
+            pt.setTaxonomyid(t);
+            postTaxonomyFacade.create(pt);
+        }
+    }
+    
+    public void makeTaxonomy(String asd) {
+        if(taxonomyToCreate.isEmpty())
+            return;
+        
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage(null, new FacesMessage("Az új tag bekerült a listába"));
+        
+        System.out.println("@TaxCreate " + taxonomyToCreate);
+        Taxonomy tax = new Taxonomy();
+        
+        tax.setCategoryname(taxonomyToCreate);
+        System.out.println("@TaxCreate/set");
+        taxonomyFacade.create(tax);
+        System.out.println("@TaxCreate/create");
+        
     }
     
     private void saveTaxonomies() {
@@ -263,7 +347,7 @@ public class PostController implements Serializable {
         performDestroy();
         recreatePagination();
         recreateModel();
-        return "List";
+        return "List?faces-redirect=true";
     }
 
     public String destroyAndView() {
@@ -360,17 +444,14 @@ public class PostController implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
     }
-
-    public String getTaxonomies(int id) {
-        Post current = (Post) items.getRowData();
-        if (current == null) {
-            return "";
-        }
+    
+    public String getTaxonomiesForView(int id) {
         Collection<Posttaxonomy> posttaxonomies = current.getPosttaxonomyCollection();
-        if (posttaxonomies == null || posttaxonomies.size() == 0) {
+        if (posttaxonomies == null || posttaxonomies.isEmpty()) {
             return "";
         }
 
+        //System.out.println("2..." + posttaxonomies.toString());
         StringBuilder sb = null;
         for (Posttaxonomy posttaxonomy : posttaxonomies) {
             if (posttaxonomy.getTaxonomyid() == null
@@ -385,7 +466,36 @@ public class PostController implements Serializable {
                 sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
             }
         }
-        System.out.println("-------------" + sb.toString());
+        //System.out.println("-------------" + sb.toString());
+        return sb.toString();
+    }
+    
+    public String getTaxonomies(int id) {
+        Post current = (Post) items.getRowData();
+        if (current == null) {
+            return "";
+        }
+        //System.out.println("1...");
+        Collection<Posttaxonomy> posttaxonomies = current.getPosttaxonomyCollection();
+        if (posttaxonomies == null || posttaxonomies.size() == 0) {
+            return "";
+        }
+        //System.out.println("2...");
+        StringBuilder sb = null;
+        for (Posttaxonomy posttaxonomy : posttaxonomies) {
+            if (posttaxonomy.getTaxonomyid() == null
+                    || posttaxonomy.getTaxonomyid().getCategoryname() == null) {
+                continue;
+            }
+            if (sb == null) {
+                sb = new StringBuilder();
+                sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
+            } else {
+                sb.append(", ");
+                sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
+            }
+        }
+        //System.out.println("-------------" + sb.toString());
         return sb.toString();
     }
 
@@ -419,7 +529,7 @@ public class PostController implements Serializable {
         if (taxonomies == null) 
             taxonomies = new ArrayList<Taxonomy>();
         String tag = event.getObject().toString();
-        System.out.println("*-*-*-*-: TTAAGGG: " + tag);
+        //System.out.println("*-*-*-*-: TTAAGGG: " + tag);
         
         Taxonomy taxonomy = taxonomyFacade.findByCategoryName(tag);
         taxonomies.add(taxonomy);
@@ -431,14 +541,14 @@ public class PostController implements Serializable {
 
         List<String> result = new ArrayList<String>();
         for (Taxonomy taxonomy : tags) {
-            System.out.println("*-*-*- Taxonomy: " + taxonomy.getCategoryname());
+            //System.out.println("*-*-*- Taxonomy: " + taxonomy.getCategoryname());
             result.add(taxonomy.getCategoryname());
         }
         return result;
     }
 
     public List<String> complete(String query) {
-        System.out.println(" CCOOMMPPLLEETT " + query);
+        //System.out.println(" CCOOMMPPLLEETT " + query);
         List<String> results = new ArrayList<String>();
 
         for (String tag : getAllTaxonomyText()) {
@@ -450,13 +560,13 @@ public class PostController implements Serializable {
     }
     
     public void addNewTaxonomy(ActionEvent event) {
-        System.out.println(" -------- ADDNEWTAG --------: " + event.toString());
+        //System.out.println(" -------- ADDNEWTAG --------: " + event.toString());
         if (taxonomies == null) 
             taxonomies = new ArrayList<Taxonomy>();
         
         String value = FacesContext.getCurrentInstance().
 		getExternalContext().getRequestParameterMap().get(":rightForm:acSimple");
-        System.out.println("WWWW: " + value);
+        //System.out.println("WWWW: " + value);
         
         Taxonomy tag = new Taxonomy();
         tag.setCategoryname(event.getSource().toString());
@@ -467,24 +577,25 @@ public class PostController implements Serializable {
     public void getText(String text) {
         String value = FacesContext.getCurrentInstance().
 		getExternalContext().getRequestParameterMap().get(":rightForm:acSimple");
-        System.out.println("WWWW: " + value);
+        //System.out.println("WWWW: " + value);
         currentTaxonomy = value;
     }
-
+    
+    
     /**
      * @return the taxonomies
      */
     public List<Taxonomy> getTaxonomies() {
         return taxonomies;
     }
-
+    
     /**
      * @param taxonomies the taxonomies to set
      */
     public void setTaxonomies(List<Taxonomy> taxonomies) {
         this.taxonomies = taxonomies;
     }
-
+    
     /**
      * @return the currentTaxonomy
      */
@@ -498,7 +609,15 @@ public class PostController implements Serializable {
     public void setCurrentTaxonomy(String currentTaxonomy) {
         this.currentTaxonomy = currentTaxonomy;
     }
+    
+    public List<String> getSelectedTaxonomies() {
+        return selectedTaxonomies;
+    }
 
+    public void setSelectedTaxonomies(List<String> selectedTaxonomies) {
+        this.selectedTaxonomies = selectedTaxonomies;
+    }
+    
     @FacesConverter(forClass = Post.class)
     public static class PostControllerConverter implements Converter {
 

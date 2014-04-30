@@ -1,0 +1,149 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 2014.04.19., 21:20:52
+    Author     : PRF_BlogProject
+*/
+
+body {
+    background: rgba(255, 255, 255, 1);
+}
+
+#header {
+	background-color: rgba(200, 200, 200, 0.3);
+	height: 8em;
+	margin: 0 0 60px 0;
+	letter-spacing: 0.1em;
+}
+
+[class*="content"] {
+	padding: 0 2em 2em 2em;
+}
+
+.section-header {
+	border-bottom: 1px solid #eee;
+	text-transform: uppercase;
+	color: #aaa;
+	font-size: 80%;
+	font-weight: 300;
+	letter-spacing: 0.1em;
+}
+
+.post-header {
+	color: #222;
+	font-weight: bold;
+}
+
+.post-meta {
+	color: rgb(153, 153, 153);
+}
+
+.post-author {
+	text-decoration: none;
+	font-size: 80%;
+	color: rgb(61, 146, 201);
+}
+
+.post-author:hover {
+	text-decoration: underline;
+}
+
+[class*="post-tx"] {
+	padding: 0.2em 0.5em 0.2em 0.5em;
+	text-decoration: none;
+	color: white;
+	border-radius: 0.6em;
+	font-size: 90%;
+}
+
+[class*="post-tx"]:hover {
+	text-decoration: underline;
+}
+
+.post-tx {
+	background-color: rgba(255, 10, 10, 0.7);
+}
+
+.post-date {
+    float:right;
+    font-size: 50%;
+}
+
+.post-desc {
+	color: rgb(68, 68, 68);
+	letter-spacing: normal;
+	line-height: 1.5em;
+	word-spacing: 0px;
+}
+
+.sidebar {
+        width: 100%;
+	background-color: rgba(200, 200, 200, 0.0);
+	padding: 2em 2em 2em 2em;
+	margin: 0 0 0 0;
+}
+
+[class*="ui-editor"] {
+    padding: 0 0 0 0;
+}
+/*
+* Pure override
+*/
+
+.pure-button {
+    font-size: 0.6em !important;
+    width: 10em !important;
+    height: 2em !important;
+    padding: 0 0 !important;
+}
+
+.pure-control-group label {
+    display: initial !important;
+}
+
+/*
+* Primefaces override
+*/
+
+.ui-datagrid-content {
+    border-style: none !important;
+}
+
+.ui-selectcheckboxmenu-label-container {
+    text-decoration: none;
+}
+
+/*
+*   CSS vol2
+*/
+
+.post_header .post_link {
+    color: #1f8dd6;
+    font-size: 21px;
+    font-weight: bold;
+    border: 1px solid rgba(31,141,214, 0.13);
+    background: rgba(31,141,214, 0.13);
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    padding: 15px 53px 15px 20px;
+    position: relative;
+    display: block;
+    text-decoration: none;
+}
+
+.post_content {
+    list-style-type: none;
+    font-family: -webkit-pictograph !important;
+    float: right;
+}
+
+.post_content .post_info {
+    float: left;
+    padding: 0 0 0 5px;
+    font-family: -webkit-pictograph !important;
+    list-style-type: none !important;
+}
