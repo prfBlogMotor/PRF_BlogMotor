@@ -4,12 +4,8 @@ import hu.prf.blog.entity.Taxonomy;
 import hu.prf.blog.bean.util.JsfUtil;
 import hu.prf.blog.bean.util.PaginationHelper;
 import hu.prf.blog.bean.session.TaxonomyFacade;
-import hu.prf.blog.entity.Post;
-import hu.prf.blog.entity.Posttaxonomy;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.ejb.EJB;

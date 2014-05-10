@@ -14,17 +14,13 @@ import hu.prf.blog.entity.Posttaxonomy;
 import hu.prf.blog.entity.Taxonomy;
 import hu.prf.blog.entity.User;
 import java.io.Serializable;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -360,15 +356,6 @@ public class PostController implements Serializable {
         List<Editing> editings = editingFacade.findEditingByPost(post.getId());
         return (editings == null) ? "0" : String.valueOf(editings.size() - 1);
     }
-    
-    public boolean isModificationInfosVisible(Post post) {
-        List<Editing> editings = editingFacade.findEditingByPost(post.getId());
-        if (editings == null)
-            return false;
-        if (editings.size() <= 1)
-            return false;
-        return true;
-    }
 
     public String prepareEdit() {
         current = (Post) getItems().getRowData();
@@ -514,7 +501,6 @@ public class PostController implements Serializable {
             return "";
         }
 
-        //System.out.println("2..." + posttaxonomies.toString());
         StringBuilder sb = null;
         for (Posttaxonomy posttaxonomy : posttaxonomies) {
             if (posttaxonomy.getTaxonomyid() == null
@@ -540,7 +526,7 @@ public class PostController implements Serializable {
         }
         //System.out.println("1...");
         Collection<Posttaxonomy> posttaxonomies = postTaxonomyFacade.findAllPostTaxonomiesByPost(currentPost);
-        if (posttaxonomies == null || posttaxonomies.size() == 0) {
+        if (posttaxonomies == null || posttaxonomies.isEmpty()) {
             return "";
         }
         //System.out.println("2...");
