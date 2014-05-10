@@ -64,7 +64,6 @@ public class UserFacade extends AbstractFacade<User> {
         CriteriaQuery cq = cb.createQuery();
         Root<User> u = cq.from(User.class);
         cq.select(u);
-        //ParameterExpression<String> un = 
         cq.where(
                 cb.and(
                         cb.equal(u.get("username"), defaultUsername),

@@ -148,6 +148,25 @@ WITH (
 ALTER TABLE "posttaxonomy"
   OWNER TO postgres;
 
+CREATE TABLE editing
+(
+  id serial NOT NULL,
+  postid bigint,
+  userid bigint,
+  date time with time zone,
+  CONSTRAINT pk_editing PRIMARY KEY (id),
+  CONSTRAINT fk_editing_post FOREIGN KEY (postid)
+      REFERENCES post (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_editing_user FOREIGN KEY (userid)
+      REFERENCES "user" (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE editing
+  OWNER TO postgres;
 
 
 

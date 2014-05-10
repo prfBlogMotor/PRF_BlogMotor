@@ -20,6 +20,7 @@
                     <p:commandLink value="Login" action="#{loginController.navigateLoginPage()}" rendered="#{loginController.renderingLoginButton}" />
                     <p:commandLink value="Register" action="#{loginController.navigateRegisterPage()}" rendered="#{loginController.renderingLoginButton}" />
                     <p:commandLink value="Logout" action="#{loginController.logout()}" rendered="#{loginController.renderingLogoutButton}" />
+                    <p:commandLink action="#{visitingController.prepareStatistics}" value="Statistics"/>
                 </div>
             </div>
             <div class="middle">

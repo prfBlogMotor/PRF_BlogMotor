@@ -24,6 +24,9 @@
                 </header>
             <ui:insert name="body">Main Content</ui:insert>
             <div class="sidebar pure-u-1-5">
+                <p:commandButton styleClass="pure-button pure-button-active"
+                                    value="Statisztikák" 
+                                    action="#{visitingController.prepareStatistics()}" />
                 <div class="sidebar">
                     <c:choose>
                     <c:when test="${loginController.current != null}">
