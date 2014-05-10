@@ -31,15 +31,15 @@
                             <h:form>
                                 <p:commandButton styleClass="pure-button pure-button-active"
                                                  value="Főoldal" 
-                                                 action="#{loginController.navigateHomePage()}" />
+                                                 action="#{loginController.navigateHomePage}" />
                                 <p:commandButton styleClass="pure-button pure-button-active"
                                                          value="Statisztikák" 
-                                                         action="#{visitingController.prepareStatistics()}" />
+                                                         action="#{visitingController.prepareStatistics}" />
                             </h:form>
                         </fieldset>
 
                         <c:choose>
-                            <c:when test="${!loginController.userLoggedIn}">
+                            <c:when test="${loginController.userLoggedIn}">
                                 <fieldset>
                                     <legend>Bejelentkezve</legend>
                                     <p>#{loginController.current.username}</p>

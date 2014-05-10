@@ -45,9 +45,6 @@ public class Editing implements Serializable {
     @Column(name = "date")
     @Temporal(TemporalType.TIME)
     private Date date;
-    @JoinColumn(name = "userid", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User userid;
     @JoinColumn(name = "postid", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Post postid;
@@ -73,14 +70,6 @@ public class Editing implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public User getUserid() {
-        return userid;
-    }
-
-    public void setUserid(User userid) {
-        this.userid = userid;
     }
 
     public Post getPostid() {

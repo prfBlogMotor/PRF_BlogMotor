@@ -68,8 +68,9 @@ body {
 }
 
 .post-date {
+    margin: 0 10px;
     float:right;
-    font-size: 50%;
+    font-size: 30%;
 }
 
 .post-desc {

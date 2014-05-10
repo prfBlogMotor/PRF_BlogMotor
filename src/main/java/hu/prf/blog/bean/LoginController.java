@@ -86,8 +86,10 @@ public class LoginController implements Serializable {
     }
     
     public boolean isUserLoggedIn() {
-        if (current == null) {
-            current = getFacade().getUnknownUser();
+        User unknown = getFacade().getUnknownUser();
+        
+        if (current == null || current.getId() == unknown.getId()) {
+            current = unknown;
             createVisiting();
             return false;
         }

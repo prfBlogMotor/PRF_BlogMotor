@@ -23,7 +23,9 @@
                         <header class="post-header">
                             <h1 class="post_header">
                                 <h:commandLink class="post_link" action="#{postController.changeToView}" value="#{item.title}" />
-                                <span href="#" class="post-date">#{item.date}</span>
+                                <span href="#" class="post-date">Created: #{item.date}</span>
+                                <span href="#" class="post-date">Last Modified: #{postController.getLastModifiedDate(item)} by #{postController.getLastModifiedBy(item)}</span>
+                                <span href="#" class="post-date">Edited: #{postController.getPostModificationCount(item)} times</span>
                             </h1>
                             <ul class="post_content">
                                 <li class="post_info">

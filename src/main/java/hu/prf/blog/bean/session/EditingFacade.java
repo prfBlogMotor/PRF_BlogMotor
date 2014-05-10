@@ -7,10 +7,17 @@
 package hu.prf.blog.bean.session;
 
 
+import static hu.prf.blog.bean.session.UserFacade.defaultPassword;
+import static hu.prf.blog.bean.session.UserFacade.defaultUsername;
 import hu.prf.blog.entity.Editing;
+import hu.prf.blog.entity.User;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 /**
  *
@@ -29,5 +36,19 @@ public class EditingFacade extends AbstractFacade<Editing> {
 
     public EditingFacade() {
         super(Editing.class);
+    }
+    
+    public List<Editing> findEditingByPost(long id) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery cq = cb.createQuery();
+        Root<Editing> root = cq.from(Editing.class);
+        cq.select(root);
+        cq.where(cb.equal(root.get("postid"), id));
+
+        List results = em.createQuery(cq).getResultList();
+        for (Object e : results) {
+            System.out.println("******** ****** Editing ID : " + ((Editing)e).getId());
+        }
+        return results;
     }
 }
