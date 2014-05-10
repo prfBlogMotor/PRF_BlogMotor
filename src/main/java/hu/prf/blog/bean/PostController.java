@@ -271,8 +271,17 @@ public class PostController implements Serializable {
 
     private void addTaxonomies() {
         System.out.println("Taxonomy hozzaadasa");
+        Collection<Posttaxonomy> posttaxonomies = postTaxonomyFacade.findAllPostTaxonomiesByPost(current);
         for (String tax : selectedTaxonomies) {
-//            System.out.println(Long.parseLong(tax));
+            boolean isContains = false;
+            for (Posttaxonomy posttaxonomy : posttaxonomies) {
+                if (Long.parseLong(tax) == (posttaxonomy.getTaxonomyid().getId())) {
+                    System.out.println("+++ A " + posttaxonomy.getTaxonomyid().getCategoryname() + " már szerepelt!");
+                    isContains = true;
+                }
+            }
+            
+            if (isContains) continue;
             Taxonomy t = taxonomyFacade.findById(Long.parseLong(tax));
             System.out.println(t.getCategoryname());
             Posttaxonomy pt = new Posttaxonomy();
@@ -349,7 +358,16 @@ public class PostController implements Serializable {
     
     public String getPostModificationCount(Post post) {
         List<Editing> editings = editingFacade.findEditingByPost(post.getId());
-        return (editings == null) ? "0" : String.valueOf(editings.size());
+        return (editings == null) ? "0" : String.valueOf(editings.size() - 1);
+    }
+    
+    public boolean isModificationInfosVisible(Post post) {
+        List<Editing> editings = editingFacade.findEditingByPost(post.getId());
+        if (editings == null)
+            return false;
+        if (editings.size() <= 1)
+            return false;
+        return true;
     }
 
     public String prepareEdit() {
@@ -367,9 +385,13 @@ public class PostController implements Serializable {
 
     public String update() {
         try {
-            saveTaxonomies();
+            System.out.println("+++ UPDATE: before texonomies saving");
+            addTaxonomies();
+            System.out.println("+++ UPDATE: before editing saving");
             saveEditing();
+            System.out.println("+++ UPDATE: before post saving");
             getFacade().edit(current);
+            System.out.println("+++ UPDATE: success");
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostUpdated"));
             return "View";
         } catch (Exception e) {
@@ -380,6 +402,9 @@ public class PostController implements Serializable {
 
     public String destroy() {
         current = (Post) getItems().getRowData();
+        for (Editing editing : editingFacade.findEditingByPost(current.getId())) {
+            editingFacade.remove(editing);
+        }
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         performDestroy();
         recreatePagination();
@@ -508,13 +533,13 @@ public class PostController implements Serializable {
         return sb.toString();
     }
 
-    public String getTaxonomies(int id) {
-        Post current = (Post) items.getRowData();
-        if (current == null) {
+    public String getTaxonomies(long id) {
+        Post currentPost = (Post)getFacade().find(id);
+        if (currentPost == null) {
             return "";
         }
         //System.out.println("1...");
-        Collection<Posttaxonomy> posttaxonomies = current.getPosttaxonomyCollection();
+        Collection<Posttaxonomy> posttaxonomies = postTaxonomyFacade.findAllPostTaxonomiesByPost(currentPost);
         if (posttaxonomies == null || posttaxonomies.size() == 0) {
             return "";
         }

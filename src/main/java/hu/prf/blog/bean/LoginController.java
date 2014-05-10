@@ -119,9 +119,11 @@ public class LoginController implements Serializable {
     }
     
     public String navigateHomePage() {
-        current = getFacade().getUnknownUser();
-        createVisiting();
-        return "posts/List?faces-redirect=true";
+        if (current == null) {
+            current = getFacade().getUnknownUser();
+            createVisiting();
+        }
+        return "/post/List.xhtml?faces-redirect=true";
     }
     
     public boolean isRenderingLoginButton() {

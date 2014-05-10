@@ -59,14 +59,6 @@ public class VisitingController implements Serializable {
     }
     
     private void setCalendars() {
-//        from = Calendar.getInstance();
-//        from.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
-//        from.clear(Calendar.MINUTE);
-//        from.clear(Calendar.SECOND);
-//        from.clear(Calendar.MILLISECOND);
-//        from.set(Calendar.DAY_OF_MONTH, 1);
-//        from.set(Calendar.MONTH, from.get(Calendar.MONTH)-1);
-
         to = Calendar.getInstance();
         to.set(Calendar.HOUR_OF_DAY, 0); // ! clear would not reset the hour of day !
         to.clear(Calendar.MINUTE);
@@ -98,14 +90,12 @@ public class VisitingController implements Serializable {
             for (Visiting visiting : visitingsInThisMonth) {
                 if (visiting.getDate().getTime() > getDayStart(newFrom).getTime().getTime() && visiting.getDate().getTime() < getDayEnd(newFrom).getTime().getTime()) {
                     if (defaultUser.getId() == visiting.getUserid().getId())
-                        ds.setUserCount(ds.getUnknownCount() + 1);
+                        ds.setUnknownCount(ds.getUnknownCount() + 1);
                     else
                         ds.setUserCount(ds.getUserCount() + 1);
                 }
             }
-            
             dailyStats.add(ds);
-            System.out.println("--- ds: "  + ds.getDay() + ", uc: " + ds.getUserCount() + ", unknownc: " + ds.getUnknownCount());
             newFrom.add(Calendar.DAY_OF_YEAR, 1);
         }
     }

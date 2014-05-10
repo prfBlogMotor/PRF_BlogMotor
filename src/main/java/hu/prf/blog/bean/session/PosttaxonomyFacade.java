@@ -6,6 +6,7 @@
 
 package hu.prf.blog.bean.session;
 
+import hu.prf.blog.entity.Post;
 import hu.prf.blog.entity.Posttaxonomy;
 import hu.prf.blog.entity.Taxonomy;
 import hu.prf.blog.entity.User;
@@ -42,6 +43,17 @@ public class PosttaxonomyFacade extends AbstractFacade<Posttaxonomy> {
         Root<Posttaxonomy> u = cq.from(Posttaxonomy.class);
         cq.select(u);
         cq.where(cb.equal(u.get("taxonomyid"), taxonomy.getId()));
+
+        List results = em.createQuery(cq).getResultList();
+        return results;
+    }
+    
+    public Collection<Posttaxonomy> findAllPostTaxonomiesByPost(Post post) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery cq = cb.createQuery();
+        Root<Posttaxonomy> u = cq.from(Posttaxonomy.class);
+        cq.select(u);
+        cq.where(cb.equal(u.get("postid"), post.getId()));
 
         List results = em.createQuery(cq).getResultList();
         return results;

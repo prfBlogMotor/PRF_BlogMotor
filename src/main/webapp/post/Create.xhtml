@@ -13,7 +13,7 @@
                     <h:form id="mainForm" class="pure-form pure-form-aligned">
                         <fieldset>
                             <div class="pure-control-group">
-                            <!--Cím-->
+                                <!--Cím-->
                                 <label for="title">Cím</label>
                                 <p:inputText id="title" type="text" placeholder="A poszt címe" 
                                              value="#{postController.selected.title}"
@@ -23,7 +23,7 @@
                             <!--Szöveg-->
                             <div class="pure-control-group">
                                 <p:editor id="editor"
-                                             value="#{postController.selected.text}" />
+                                          value="#{postController.selected.text}" />
                             </div>
                             <!--Tag-ek lista-->
                             <p:panel id="up" header="Tag-ek">
@@ -40,8 +40,9 @@
                             <br/>
                             <!--Poszt mentese-->
                             <h:commandButton styleClass="pure-button pure-button-active"
-                                    action="#{postController.create(loginController.current)}" 
-                                    value="#{hu_bundle.CreatePostSaveLink}" id="saveButton"/>
+                                             action="#{postController.create(loginController.current)}" 
+                                             value="#{hu_bundle.CreatePostSaveLink}" id="saveButton"/>
+
                             <p:dialog modal="true" showEffect="fade" hideEffect="fade" widgetVar="dlg" resizable="false">  
                                 <p:dataList id="display" value="#{postController.selectedTaxonomies}" var="taxonomies">  
                                     #{taxonomies}  
@@ -49,27 +50,20 @@
                             </p:dialog>
                         </fieldset>
                     </h:form>
-                     <!--Új tag-->
+                    <!--Új tag-->
 
-                    <p:lightBox>
-                        <h:outputLink value="#">
-                            <h:outputText value="Új tag" />
-                        </h:outputLink>
-                        <f:facet name="inline">
-                             <p:panel style="width: 300px">
-                                <h:form prependId="false">
-                                    <label for="taxName">Új tag</label>
-                                    <p:inputText id="taxName" type="text" placeholder="A tag neve" 
-                                             value="#{postController.taxonomyToCreate}"
-                                             style="width:100px"/>
-                                    <br/>
-                                    <p:commandButton value="Létrehoz" id="btnTax" process="@this,taxName"  
-                                        update="@([id*=up])"
-                                        actionListener="#{postController.makeTaxonomy(postController.taxonomyToCreate)}"/>
-                                </h:form>
-                            </p:panel>
-                        </f:facet>
-                    </p:lightBox>
+
+                    <p:panel id="up" header="Út tag létrehozása">
+                        <h:form prependId="false">
+                            <label for="taxName">Új tag</label>
+                            <p:inputText id="taxName" type="text" placeholder="A tag neve" 
+                                         value="#{postController.taxonomyToCreate}"
+                                         style="width:300px; margin: 0 30px;"/>
+                            <p:commandButton value="Létrehoz" id="btnTax" process="@this,taxName"  
+                                             update="@([id*=up])" style="margin: 0 50px;"
+                                             actionListener="#{postController.makeTaxonomy(postController.taxonomyToCreate)}"/>
+                        </h:form>
+                    </p:panel>
                 </div>
             </div>
         </ui:define>

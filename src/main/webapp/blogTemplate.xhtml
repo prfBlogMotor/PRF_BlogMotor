@@ -31,7 +31,7 @@
                             <h:form>
                                 <p:commandButton styleClass="pure-button pure-button-active"
                                                  value="Főoldal" 
-                                                 action="#{loginController.navigateHomePage}" />
+                                                 action="#{loginController.navigateHomePage}" ajax="false" />
                                 <p:commandButton styleClass="pure-button pure-button-active"
                                                          value="Statisztikák" 
                                                          action="#{visitingController.prepareStatistics}" />
@@ -49,7 +49,7 @@
                                                          action="#{postController.prepareCreate}" />
                                         <p:commandButton styleClass="pure-button pure-button-active"
                                                          value="Logout" 
-                                                         action="#{loginController.logout}" />
+                                                         action="#{loginController.logout}" ajax="false" />
                                         
                                     </h:form>
                                 </fieldset>
@@ -70,7 +70,7 @@
 
                                             <p:commandButton styleClass="pure-button pure-button-active"
                                                              value="Login" 
-                                                             action="#{loginController.login}" update="growlMessage" />
+                                                             action="#{loginController.login}" update="growlMessage" ajax="false" />
                                         </p:panelGrid>
                                     </h:form>
                                 </fieldset>
