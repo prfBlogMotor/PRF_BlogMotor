@@ -22,59 +22,70 @@
                         </h1>
                     </hgroup>
                 </header>
-            <ui:insert name="body">Main Content</ui:insert>
-            <div class="sidebar pure-u-1-5">
-                <p:commandButton styleClass="pure-button pure-button-active"
-                                    value="Statisztikák" 
-                                    action="#{visitingController.prepareStatistics()}" />
-                <div class="sidebar">
-                    <c:choose>
-                    <c:when test="${loginController.current != null}">
+                <ui:insert name="body">Main Content</ui:insert>
+                <div class="sidebar pure-u-1-5">
+
+                    <div class="sidebar">
                         <fieldset>
-                        <legend>Bejelentkezve</legend>
-                            <p>#{loginController.current.username}</p>
+                            <legend>Navigálás</legend>
                             <h:form>
                                 <p:commandButton styleClass="pure-button pure-button-active"
-                                    value="Új poszt" 
-                                    action="#{postController.prepareCreate}" />
+                                                 value="Főoldal" 
+                                                 action="#{loginController.navigateHomePage()}" />
                                 <p:commandButton styleClass="pure-button pure-button-active"
-                                    value="Logout" 
-                                    action="#{loginController.logout}" />
+                                                         value="Statisztikák" 
+                                                         action="#{visitingController.prepareStatistics()}" />
                             </h:form>
                         </fieldset>
-                    </c:when>
-                    <c:otherwise>
-                    <fieldset>
-                        <legend>Login</legend>
-                        <h:form>
-                        <p:growl id="growlMessage" showDetail="true" sticky="true" />
-                            <p:panelGrid columns="2">
-                                <h:outputText value="Név: " />  
-                                <p:inputText required="true" label="un"  
-                                             value="#{loginController.username}" />  
 
-                                <h:outputText value="Jelszó: " />  
-                                <p:inputText required="true" label="pw"  
-                                             value="#{loginController.password}" /> 
+                        <c:choose>
+                            <c:when test="${!loginController.userLoggedIn}">
+                                <fieldset>
+                                    <legend>Bejelentkezve</legend>
+                                    <p>#{loginController.current.username}</p>
+                                    <h:form>
+                                        <p:commandButton styleClass="pure-button pure-button-active"
+                                                         value="Új poszt" 
+                                                         action="#{postController.prepareCreate}" />
+                                        <p:commandButton styleClass="pure-button pure-button-active"
+                                                         value="Logout" 
+                                                         action="#{loginController.logout}" />
+                                        
+                                    </h:form>
+                                </fieldset>
+                            </c:when>
+                            <c:otherwise>
+                                <fieldset>
+                                    <legend>Login</legend>
+                                    <h:form>
+                                        <p:growl id="growlMessage" showDetail="true" sticky="true" />
+                                        <p:panelGrid columns="2">
+                                            <h:outputText value="Név: " />  
+                                            <p:inputText required="true" label="un"  
+                                                         value="#{loginController.username}" />  
 
-                                <p:commandButton styleClass="pure-button pure-button-active"
-                                    value="Login" 
-                                    action="#{loginController.login}" update="growlMessage" />
-                            </p:panelGrid>
-                        </h:form>
-                    </fieldset>
-                    </c:otherwise>
-                    </c:choose>
+                                            <h:outputText value="Jelszó: " />  
+                                            <p:inputText required="true" label="pw"  
+                                                         value="#{loginController.password}" /> 
+
+                                            <p:commandButton styleClass="pure-button pure-button-active"
+                                                             value="Login" 
+                                                             action="#{loginController.login}" update="growlMessage" />
+                                        </p:panelGrid>
+                                    </h:form>
+                                </fieldset>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div class="sidebar">
+                        <fieldset>
+                            <legend>Tagek</legend>
+                            <p:tagCloud model="#{taxonomyController.tagsModel}">
+
+                            </p:tagCloud>
+                        </fieldset>
+                    </div>
                 </div>
-                <div class="sidebar">
-                    <fieldset>
-                        <legend>Tagek</legend>
-                        <p:tagCloud model="#{taxonomyController.tagsModel}">
-
-                        </p:tagCloud>
-                    </fieldset>
-                </div>
-            </div>
             </div>
         </div>
     </h:body>

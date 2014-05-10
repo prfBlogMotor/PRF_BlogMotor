@@ -23,8 +23,8 @@
     <managed-bean>
         <managed-bean-name>postController</managed-bean-name>
         <managed-bean-class>hu.prf.blog.bean.PostController</managed-bean-class>
-        <managed-bean-scope>session</managed-bean-scope>
-    </managed-bean>
+    
+        <managed-bean-scope>session</managed-bean-scope></managed-bean>
     
     <navigation-rule>
 	<from-view-id>/post/*</from-view-id>

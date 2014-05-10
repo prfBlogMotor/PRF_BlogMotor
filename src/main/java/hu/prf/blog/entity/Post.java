@@ -44,6 +44,8 @@ import org.hibernate.annotations.FetchMode;
     @NamedQuery(name = "Post.findByText", query = "SELECT p FROM Post p WHERE p.text = :text"),
     @NamedQuery(name = "Post.findByDate", query = "SELECT p FROM Post p WHERE p.date = :date")})
 public class Post implements Serializable {
+    @OneToMany(mappedBy = "postid", fetch = FetchType.LAZY)
+    private Collection<Editing> editingCollection;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -156,6 +158,15 @@ public class Post implements Serializable {
     @Override
     public String toString() {
         return "hu.prf.blog.entity.Post[ id=" + id + " ]";
+    }
+
+    @XmlTransient
+    public Collection<Editing> getEditingCollection() {
+        return editingCollection;
+    }
+
+    public void setEditingCollection(Collection<Editing> editingCollection) {
+        this.editingCollection = editingCollection;
     }
     
 }

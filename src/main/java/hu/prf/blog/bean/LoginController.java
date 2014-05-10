@@ -28,6 +28,8 @@ import javax.faces.context.FacesContext;
 @SessionScoped
 public class LoginController implements Serializable {
     private User current;
+    private Visiting visiting;
+    
     private String username;
     private String password;
     
@@ -83,6 +85,15 @@ public class LoginController implements Serializable {
         return "success";
     }
     
+    public boolean isUserLoggedIn() {
+        if (current == null) {
+            current = getFacade().getUnknownUser();
+            createVisiting();
+            return false;
+        }
+        return true;
+    }
+    
     public String navigateLoginPage() {
         return "/Login?faces-redirect=true";
     }
@@ -92,10 +103,17 @@ public class LoginController implements Serializable {
     }
     
     private void createVisiting() {
-        Visiting visiting = new Visiting();
-        visiting.setUserid(current);
-        visiting.setDate(Calendar.getInstance().getTime());
-        visitingFacade.create(visiting);
+        if (visiting == null) {
+            visiting = new Visiting();
+            visiting.setUserid(current);
+            visiting.setDate(Calendar.getInstance().getTime());
+            
+            visitingFacade.create(visiting);
+        } else {
+            visiting.setUserid(current);
+            visitingFacade.edit(visiting);
+        }
+        
     }
     
     public String navigateHomePage() {
