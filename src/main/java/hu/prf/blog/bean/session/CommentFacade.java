@@ -7,9 +7,14 @@
 package hu.prf.blog.bean.session;
 
 import hu.prf.blog.entity.Comment;
+import hu.prf.blog.entity.Editing;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 /**
  *
@@ -29,4 +34,14 @@ public class CommentFacade extends AbstractFacade<Comment> {
         super(Comment.class);
     }
     
+    public List<Comment> findCommentsByPost(long postid) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery cq = cb.createQuery();
+        Root<Comment> root = cq.from(Comment.class);
+        cq.select(root);
+        cq.where(cb.equal(root.get("postid"), postid));
+
+        List results = em.createQuery(cq).getResultList();
+        return results;
+    }
 }

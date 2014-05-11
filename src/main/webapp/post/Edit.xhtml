@@ -34,8 +34,8 @@
                                 <p:selectCheckboxMenu id="selectTaxonomy" style="text-decoration: none"
                                                       value="#{postController.selectedTaxonomies}" 
                                                       label="Válassz" 
-                                                      filter="true" filterMatchMode="startsWith">  
-                                    <f:selectItems value="#{postController.taxonomiesAsMap()}" />  
+                                                      filter="true" filterMatchMode="startsWith">
+                                    <f:selectItems value="#{postController.taxonomiesAsMap()}" noSelectionValue="true" />  
                                 </p:selectCheckboxMenu>  
                                 <br/>
                                 <br/>
@@ -54,25 +54,17 @@
                     </h:form>
                     <!--Új tag-->
 
-                    <p:lightBox>
-                        <h:outputLink value="#">
-                            <h:outputText value="Új tag" />
-                        </h:outputLink>
-                        <f:facet name="inline">
-                            <p:panel style="width: 300px">
-                                <h:form prependId="false">
-                                    <label for="taxName">Új tag</label>
-                                    <p:inputText id="taxName" type="text" placeholder="A tag neve" 
-                                                 value="#{postController.taxonomyToCreate}"
-                                                 style="width:100px"/>
-                                    <br/>
-                                    <p:commandButton value="Létrehoz" id="btnTax" process="@this,taxName"  
-                                                     update="@([id*=up])"
-                                                     actionListener="#{postController.makeTaxonomy(postController.taxonomyToCreate)}"/>
-                                </h:form>
-                            </p:panel>
-                        </f:facet>
-                    </p:lightBox>
+                    <p:panel id="up" header="Út tag létrehozása">
+                        <h:form prependId="false">
+                            <label for="taxName">Új tag</label>
+                            <p:inputText id="taxName" type="text" placeholder="A tag neve" 
+                                         value="#{postController.taxonomyToCreate}"
+                                         style="width:300px; margin: 0 30px;"/>
+                            <p:commandButton value="Létrehoz" id="btnTax" process="@this,taxName"  
+                                             update="@([id*=up])" style="margin: 0 50px;"
+                                             actionListener="#{postController.makeTaxonomy(postController.taxonomyToCreate)}"/>
+                        </h:form>
+                    </p:panel>
                 </div>
             </div>
         </ui:define>

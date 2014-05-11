@@ -63,6 +63,7 @@ public class PostController implements Serializable {
     private Comment lastComment;
 
     private List<Taxonomy> taxonomies;
+    private List<Taxonomy> allTaxonomies;
     private List<String> selectedTaxonomies;
 
     private String currentTaxonomy;
@@ -78,12 +79,10 @@ public class PostController implements Serializable {
     public int currentViewId;
 
     public String changeToView() {
-        //System.out.println("Redirecting to view...");
         current = (Post) getItems().getRowData();
         lastComment = new Comment();
         lastComment.setPostid(current);
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
-        //System.out.println("selected: " + selectedItemIndex);
         return "success";
     }
 
@@ -125,7 +124,6 @@ public class PostController implements Serializable {
     }
 
     public String saveComment(Comment comment) {
-        //System.out.println(" *** SAVE COMMENT");
         comment.setDate(Calendar.getInstance().getTime());
         try {
             commentFacade.edit(comment);
@@ -137,7 +135,6 @@ public class PostController implements Serializable {
     }
 
     public String removeComment(Comment comment) {
-        //System.out.println(" *** REMOVE COMMENT");
         try {
             commentFacade.remove(comment);
             if (comments != null) {
@@ -180,7 +177,6 @@ public class PostController implements Serializable {
     }
 
     public String prepareView() {
-        //System.out.println("Changing view...");
         current = (Post) getItems().getRowData();
         lastComment = new Comment();
         lastComment.setPostid(current);
@@ -189,36 +185,31 @@ public class PostController implements Serializable {
     }
 
     public String prepareCreate() {
-        System.out.println("@PostController/prepareCreate");
         current = new Post();
         selectedItemIndex = -1;
+        selectedTaxonomies = new ArrayList<String>();
         return "Create";
     }
 
     public String prepareAfterCreate() {
-        System.out.println("@PostController/prepareAfterCreate");
         current = new Post();
         selectedItemIndex = -1;
         return "navigate_to_list";
     }
 
-    public String create() {
-        current.setDate(Calendar.getInstance().getTime());
-        try {
-            System.out.println("---- POST CREATE");
-            getFacade().create(current);
-            System.out.println("---- POST CREATE - SAVE TAXES");
-            saveTaxonomies();
-            System.out.println("---- POST CREATE - SAVE EDITING");
-            
-
-            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
-            return prepareCreate();
-        } catch (Exception e) {
-            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
-            return null;
-        }
-    }
+//    public String create() {
+//        current.setDate(Calendar.getInstance().getTime());
+//        try {
+//            getFacade().create(current);
+//            saveTaxonomies();
+//
+//            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
+//            return prepareCreate();
+//        } catch (Exception e) {
+//            JsfUtil.addErrorMessage(e, ResourceBundle.getBundle("/Bundle").getString("PersistenceErrorOccured"));
+//            return null;
+//        }
+//    }
 
     public void saveEditing() {
         Editing editing = new Editing();
@@ -232,20 +223,14 @@ public class PostController implements Serializable {
         current.setDate(Calendar.getInstance().getTime());
         current.setUserid(user);
         try {
-
-//            saveTaxonomies();
-            System.out.println("@PostController/create");
             getFacade().create(current);
-            System.out.println("@PostController/create - tax save");
             addTaxonomies();
-            
+
             saveEditing();
-//            JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostCreated"));
-//            return prepareCreate();
 
             FacesContext context = FacesContext.getCurrentInstance();
             context.addMessage(null, new FacesMessage("Az új poszt létrehozva", current.getTitle()));
-//            return "success";
+            
             return prepareList();
         } catch (Exception e) {
             FacesContext context = FacesContext.getCurrentInstance();
@@ -266,18 +251,13 @@ public class PostController implements Serializable {
     }
 
     private void addTaxonomies() {
-        System.out.println("Taxonomy hozzaadasa");
         Collection<Posttaxonomy> posttaxonomies = postTaxonomyFacade.findAllPostTaxonomiesByPost(current);
+        for (Posttaxonomy posttaxonomy : posttaxonomies) {
+            postTaxonomyFacade.remove(posttaxonomy);
+        }
+        current.setPosttaxonomyCollection(null);
+        
         for (String tax : selectedTaxonomies) {
-            boolean isContains = false;
-            for (Posttaxonomy posttaxonomy : posttaxonomies) {
-                if (Long.parseLong(tax) == (posttaxonomy.getTaxonomyid().getId())) {
-                    System.out.println("+++ A " + posttaxonomy.getTaxonomyid().getCategoryname() + " már szerepelt!");
-                    isContains = true;
-                }
-            }
-            
-            if (isContains) continue;
             Taxonomy t = taxonomyFacade.findById(Long.parseLong(tax));
             System.out.println(t.getCategoryname());
             Posttaxonomy pt = new Posttaxonomy();
@@ -292,77 +272,86 @@ public class PostController implements Serializable {
             return;
         }
 
+        allTaxonomies = taxonomyFacade.findAll();
+
         FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage(null, new FacesMessage("Az új tag bekerült a listába"));
+        for (Taxonomy taxonomy : allTaxonomies) {
+            System.out.println("All tax: " + taxonomy.getCategoryname() + ", current tax: " + asd);
+            if (taxonomy.getCategoryname().equals(asd)) {
+                context.addMessage(null, new FacesMessage("A tag már létezik"));
+                return;
+            }
+        }
 
-        System.out.println("@TaxCreate " + taxonomyToCreate);
         Taxonomy tax = new Taxonomy();
-
         tax.setCategoryname(taxonomyToCreate);
-        System.out.println("@TaxCreate/set");
         taxonomyFacade.create(tax);
-        System.out.println("@TaxCreate/create");
-
+        
+        context.addMessage(null, new FacesMessage("Az új tag bekerült a listába"));
     }
 
-    private void saveTaxonomies() {
-        if (taxonomies == null) {
-            taxonomies = new ArrayList<Taxonomy>();
-        }
+//    private void saveTaxonomies() {
+//        if (taxonomies == null) {
+//            taxonomies = new ArrayList<Taxonomy>();
+//        }
+//
+//        Collection<Taxonomy> tags = getTaxonomiesCollection(current);
+//
+//        String[] splitted = currentTaxonomy.split(",");
+//        for (String string : splitted) {
+//            boolean isPersisted = false;
+//            for (Taxonomy taxonomy : tags) {
+//                String tag = taxonomy.getCategoryname();
+//                if (string.equalsIgnoreCase(tag)) {
+//                    isPersisted = true;
+//                    break;
+//                }
+//            }
+//
+//            // TODO, ha más post cimkéjét adjuk meg, akkor azokat is járja be és hozzon létre új posttaxonomy-kat...
+//            if (!isPersisted) {
+//                Taxonomy tag = new Taxonomy();
+//                tag.setCategoryname(string.trim());
+//                taxonomies.add(tag);
+//                taxonomyFacade.create(tag);
+//
+//                Posttaxonomy pt = new Posttaxonomy();
+//                pt.setPostid(current);
+//                pt.setTaxonomyid(tag);
+//                postTaxonomyFacade.create(pt);
+//            }
+//        }
+//    }
 
-        Collection<Taxonomy> tags = getTaxonomiesCollection(current);
-
-        String[] splitted = currentTaxonomy.split(",");
-        for (String string : splitted) {
-            boolean isPersisted = false;
-            for (Taxonomy taxonomy : tags) {
-                String tag = taxonomy.getCategoryname();
-                if (string.equalsIgnoreCase(tag)) {
-                    isPersisted = true;
-                    break;
-                }
-            }
-
-            // TODO, ha más post cimkéjét adjuk meg, akkor azokat is járja be és hozzon létre új posttaxonomy-kat...
-            if (!isPersisted) {
-                Taxonomy tag = new Taxonomy();
-                tag.setCategoryname(string.trim());
-                taxonomies.add(tag);
-                taxonomyFacade.create(tag);
-
-                Posttaxonomy pt = new Posttaxonomy();
-                pt.setPostid(current);
-                pt.setTaxonomyid(tag);
-                postTaxonomyFacade.create(pt);
-            }
-        }
-    }
-    
     public String getLastModifiedDate(Post post) {
         List<Editing> editings = editingFacade.findEditingByPost(post.getId());
-        if (editings == null || editings.isEmpty())
+        if (editings == null || editings.isEmpty()) {
             return post.getDate().toString();
+        }
         return editings.get(editings.size() - 1).getDate().toString();
     }
-    
+
     public String getLastModifiedBy(Post post) {
         List<Editing> editings = editingFacade.findEditingByPost(post.getId());
-        if (editings == null || editings.isEmpty())
+        if (editings == null || editings.isEmpty()) {
             return post.getUserid().getUsername();
+        }
         return editings.get(editings.size() - 1).getPostid().getUserid().getUsername();
     }
-    
+
     public String getPostModificationCount(Post post) {
         List<Editing> editings = editingFacade.findEditingByPost(post.getId());
         return (editings == null) ? "0" : String.valueOf(editings.size() - 1);
     }
-    
+
     public boolean isModificationInfosVisible(Post post) {
         List<Editing> editings = editingFacade.findEditingByPost(post.getId());
-        if (editings == null)
+        if (editings == null) {
             return false;
-        if (editings.size() <= 1)
+        }
+        if (editings.size() <= 1) {
             return false;
+        }
         return true;
     }
 
@@ -372,7 +361,7 @@ public class PostController implements Serializable {
 
         List<String> selectedTaxonomiesList = new ArrayList<String>();
         for (Taxonomy taxonomy : getTaxonomiesCollection(current)) {
-            selectedTaxonomiesList.add(taxonomy.getCategoryname());
+            selectedTaxonomiesList.add(String.valueOf(taxonomy.getId()));
         }
         setSelectedTaxonomies(selectedTaxonomiesList);
 
@@ -381,13 +370,10 @@ public class PostController implements Serializable {
 
     public String update() {
         try {
-            System.out.println("+++ UPDATE: before texonomies saving");
             addTaxonomies();
-            System.out.println("+++ UPDATE: before editing saving");
             saveEditing();
-            System.out.println("+++ UPDATE: before post saving");
             getFacade().edit(current);
-            System.out.println("+++ UPDATE: success");
+            
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostUpdated"));
             return "View";
         } catch (Exception e) {
@@ -398,9 +384,7 @@ public class PostController implements Serializable {
 
     public String destroy() {
         current = (Post) getItems().getRowData();
-        for (Editing editing : editingFacade.findEditingByPost(current.getId())) {
-            editingFacade.remove(editing);
-        }
+
         selectedItemIndex = pagination.getPageFirstItem() + getItems().getRowIndex();
         performDestroy();
         recreatePagination();
@@ -436,7 +420,16 @@ public class PostController implements Serializable {
                 }
             }
 
+            for (Editing editing : editingFacade.findEditingByPost(current.getId())) {
+                editingFacade.remove(editing);
+            }
+            
+            for (Comment comment : commentFacade.findCommentsByPost(current.getId())) {
+                commentFacade.remove(comment);
+            }
+
             current.setPosttaxonomyCollection(null);
+            current.setCommentCollection(null);
             getFacade().remove(current);
             JsfUtil.addSuccessMessage(ResourceBundle.getBundle("/Bundle").getString("PostDeleted"));
         } catch (Exception e) {
@@ -529,7 +522,7 @@ public class PostController implements Serializable {
     }
 
     public String getTaxonomies(long id) {
-        Post currentPost = (Post)getFacade().find(id);
+        Post currentPost = (Post) getFacade().find(id);
         if (currentPost == null) {
             return "";
         }
@@ -573,8 +566,9 @@ public class PostController implements Serializable {
         Collection<Posttaxonomy> posttaxonomies = post.getPosttaxonomyCollection();
 
         TagCloudModel model = new DefaultTagCloudModel();
-        for (Posttaxonomy posttaxonomy : posttaxonomies)
+        for (Posttaxonomy posttaxonomy : posttaxonomies) {
             model.addTag(new DefaultTagCloudItem(posttaxonomy.getTaxonomyid().getCategoryname(), 1));
+        }
         return model;
     }
 
@@ -584,8 +578,9 @@ public class PostController implements Serializable {
     }
 
     public void handleSelect(SelectEvent event) {
-        if (taxonomies == null)
+        if (taxonomies == null) {
             taxonomies = new ArrayList<Taxonomy>();
+        }
         String tag = event.getObject().toString();
 
         Taxonomy taxonomy = taxonomyFacade.findByCategoryName(tag);
@@ -667,10 +662,16 @@ public class PostController implements Serializable {
     }
 
     public List<String> getSelectedTaxonomies() {
+        for (String taxonomy : selectedTaxonomies) {
+            System.out.println("++++++++++ GetSelectedTaxonomise: " + taxonomy);
+        }
         return selectedTaxonomies;
     }
 
     public void setSelectedTaxonomies(List<String> selectedTaxonomies) {
+        for (String taxonomy : selectedTaxonomies) {
+            System.out.println("+----+ SetSelectedTaxonomise: " + taxonomy);
+        }
         this.selectedTaxonomies = selectedTaxonomies;
     }
 

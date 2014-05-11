@@ -24,7 +24,7 @@
     </session-config>
     <welcome-file-list>
         <!--<welcome-file>faces/Login.xhtml</welcome-file>-->
-        <welcome-file>/post/List.xhtml</welcome-file>
+        <welcome-file>faces/post/List.xhtml</welcome-file>
             
     </welcome-file-list>
 </web-app>
