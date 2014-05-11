@@ -56,7 +56,7 @@
                             </c:when>
                             <c:otherwise>
                                 <fieldset>
-                                    <legend>Login</legend>
+                                    <legend>Bejelentkezés</legend>
                                     <h:form>
                                         <p:growl id="growlMessage" showDetail="true" sticky="true" />
                                         <p:panelGrid columns="2">
@@ -65,15 +65,15 @@
                                                          value="#{loginController.username}" />  
 
                                             <h:outputText value="Jelszó: " />  
-                                            <p:inputText required="true" label="pw"  
+                                            <p:password required="true" label="pw"  
                                                          value="#{loginController.password}" /> 
 
                                             <p:commandButton styleClass="pure-button pure-button-active"
-                                                             value="Login" 
+                                                             value="Bejelentkezés" 
                                                              action="#{loginController.login}" update="growlMessage" ajax="false" />
                                             <p:commandButton styleClass="pure-button pure-button-active"
                                                              value="Regisztrálás" 
-                                                             action="#{loginController.navigateRegisterPage}" ajax="false" />
+                                                             action="#{loginController.navigateRegisterPage}" ajax="false" immediate="true" />
                                         </p:panelGrid>
                                     </h:form>
                                 </fieldset>

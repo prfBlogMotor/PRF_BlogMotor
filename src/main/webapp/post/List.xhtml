@@ -46,6 +46,7 @@
                         <h:outputText styleClass="post-desc"
                             value="#{item.text}" 
                             escape="false" />
+                        <br/>
                         <p:commandButton styleClass="pure-button pure-button-active"  value="Szerkeszt" action="#{postController.prepareEdit}"  rendered="#{loginController.current.equals(item.userid)}" />
                         <p:commandButton styleClass="pure-button pure-button-active"  value="Töröl" action="#{postController.destroy}"  rendered="#{loginController.current.equals(item.userid)}" />
                     </p:dataGrid>
