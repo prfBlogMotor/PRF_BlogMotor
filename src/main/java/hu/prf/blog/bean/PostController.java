@@ -356,6 +356,15 @@ public class PostController implements Serializable {
         List<Editing> editings = editingFacade.findEditingByPost(post.getId());
         return (editings == null) ? "0" : String.valueOf(editings.size() - 1);
     }
+    
+    public boolean isModificationInfosVisible(Post post) {
+        List<Editing> editings = editingFacade.findEditingByPost(post.getId());
+        if (editings == null)
+            return false;
+        if (editings.size() <= 1)
+            return false;
+        return true;
+    }
 
     public String prepareEdit() {
         current = (Post) getItems().getRowData();
@@ -501,6 +510,7 @@ public class PostController implements Serializable {
             return "";
         }
 
+        //System.out.println("2..." + posttaxonomies.toString());
         StringBuilder sb = null;
         for (Posttaxonomy posttaxonomy : posttaxonomies) {
             if (posttaxonomy.getTaxonomyid() == null
@@ -515,7 +525,6 @@ public class PostController implements Serializable {
                 sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
             }
         }
-        //System.out.println("-------------" + sb.toString());
         return sb.toString();
     }
 
@@ -526,7 +535,7 @@ public class PostController implements Serializable {
         }
         //System.out.println("1...");
         Collection<Posttaxonomy> posttaxonomies = postTaxonomyFacade.findAllPostTaxonomiesByPost(currentPost);
-        if (posttaxonomies == null || posttaxonomies.isEmpty()) {
+        if (posttaxonomies == null || posttaxonomies.size() == 0) {
             return "";
         }
         //System.out.println("2...");
@@ -544,7 +553,6 @@ public class PostController implements Serializable {
                 sb.append(posttaxonomy.getTaxonomyid().getCategoryname());
             }
         }
-        //System.out.println("-------------" + sb.toString());
         return sb.toString();
     }
 
@@ -565,9 +573,8 @@ public class PostController implements Serializable {
         Collection<Posttaxonomy> posttaxonomies = post.getPosttaxonomyCollection();
 
         TagCloudModel model = new DefaultTagCloudModel();
-        for (Posttaxonomy posttaxonomy : posttaxonomies) {
+        for (Posttaxonomy posttaxonomy : posttaxonomies)
             model.addTag(new DefaultTagCloudItem(posttaxonomy.getTaxonomyid().getCategoryname(), 1));
-        }
         return model;
     }
 
@@ -577,11 +584,9 @@ public class PostController implements Serializable {
     }
 
     public void handleSelect(SelectEvent event) {
-        if (taxonomies == null) {
+        if (taxonomies == null)
             taxonomies = new ArrayList<Taxonomy>();
-        }
         String tag = event.getObject().toString();
-        //System.out.println("*-*-*-*-: TTAAGGG: " + tag);
 
         Taxonomy taxonomy = taxonomyFacade.findByCategoryName(tag);
         taxonomies.add(taxonomy);
@@ -613,14 +618,12 @@ public class PostController implements Serializable {
     }
 
     public void addNewTaxonomy(ActionEvent event) {
-        //System.out.println(" -------- ADDNEWTAG --------: " + event.toString());
         if (taxonomies == null) {
             taxonomies = new ArrayList<Taxonomy>();
         }
 
         String value = FacesContext.getCurrentInstance().
                 getExternalContext().getRequestParameterMap().get(":rightForm:acSimple");
-        //System.out.println("WWWW: " + value);
 
         Taxonomy tag = new Taxonomy();
         tag.setCategoryname(event.getSource().toString());
